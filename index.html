@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>QRR — Espace Étudiant</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#F0F4F8;min-height:100vh;color:#1A1A1A}
+.wrap{max-width:780px;margin:0 auto;padding:.75rem}
+.hidden{display:none!important}
+.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.auth-box{background:#fff;border:1px solid #E0E0E0;border-radius:14px;padding:1.75rem;width:100%;max-width:380px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.auth-logo{width:48px;height:48px;border-radius:12px;background:#1A5276;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto .8rem}
+.auth-title{font-size:17px;font-weight:700;text-align:center;margin-bottom:.2rem}
+.auth-sub{font-size:12px;color:#666;text-align:center;margin-bottom:1.1rem}
+.tabs{display:flex;background:#F5F5F5;border-radius:8px;padding:3px;gap:3px;margin-bottom:1rem}
+.tab{flex:1;padding:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;border-radius:6px;background:transparent;color:#666}
+.tab.act{background:#fff;color:#1A5276;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.field{margin-bottom:.6rem}
+.field label{font-size:11px;color:#555;display:block;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.field input,.field select{width:100%;border:1px solid #D0D0D0;border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;transition:border .15s}
+.field input:focus,.field select:focus{outline:none;border-color:#1A5276}
+.pw{position:relative}.pw input{padding-right:34px}
+.eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:14px;padding:0}
+.btn{width:100%;padding:9px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;border:none;background:#1A5276;color:#fff;margin-top:.4rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{opacity:.9}.btn:disabled{opacity:.6;cursor:not-allowed}
+.sp{width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{font-size:12px;text-align:center;margin-top:.45rem;padding:6px 8px;border-radius:7px}
+.msg-e{background:#FEE;color:#C00}.msg-o{background:#EFE;color:#080}.msg-w{background:#FFF3E0;color:#E65100}
+.pend-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.pend-box{background:#fff;border:1px solid #FFE082;border-radius:14px;padding:2rem;max-width:380px;width:100%;text-align:center}
+.pend-icon{font-size:40px;margin-bottom:.75rem}
+.pend-title{font-size:16px;font-weight:700;margin-bottom:.35rem}
+.pend-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;background:#FFF3E0;color:#E65100;margin:.6rem 0}
+.pend-sub{font-size:12px;color:#666;line-height:1.65;margin-bottom:1rem}
+.btn-sm{padding:6px 14px;font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;border:1px solid #D0D0D0;background:#fff;color:#444}
+.topbar{display:flex;align-items:center;gap:8px;background:#1A5276;border-radius:12px;padding:.65rem .9rem;margin-bottom:.7rem}
+.topbar-logo{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fff}
+.topbar-title{font-size:13px;font-weight:700;flex:1;color:#fff}
+.avatar{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.uname{font-size:11px;color:rgba(255,255,255,.7)}
+.btn-out{border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:4px 9px;font-size:11px;cursor:pointer;background:transparent;color:rgba(255,255,255,.8)}
+.mod-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.6rem}
+.mod-btn{border:1px solid #D0D0D0;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:500;cursor:pointer;background:#fff;color:#555;display:flex;align-items:center;gap:4px;transition:all .15s}
+.mod-btn.act{color:#fff;border-color:transparent}
+.mod-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.conform-box{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:.7rem .9rem;margin-bottom:.6rem}
+.conform-title{font-size:10px;font-weight:700;color:#888;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em}
+.conform-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cv-item{display:flex;flex-direction:column;gap:2px}
+.cv-label{font-size:9px;font-weight:600;display:flex;justify-content:space-between}
+.cv-bar-wrap{background:#F0F0F0;border-radius:20px;height:4px}
+.cv-bar{height:4px;border-radius:20px;transition:width .4s}
+.cv-count{font-size:10px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:.6rem}
+.stat{background:#fff;border:1px solid #E0E0E0;border-radius:10px;padding:.5rem .65rem;text-align:center}
+.sv{font-size:18px;font-weight:700}.sl{font-size:10px;color:#888;margin-top:1px}
+.pb-wrap{background:#E8E8E8;border-radius:20px;height:3px;margin-bottom:.6rem}
+.pb-fill{height:3px;border-radius:20px;transition:width .3s}
+.lboard{background:#fff;border:1px solid #E0E0E0;border-radius:12px;padding:.75rem;margin-bottom:.6rem}
+.lb-title{font-size:12px;font-weight:700;margin-bottom:.5rem}
+.lrow{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #F5F5F5}
+.lrow:last-child{border-bottom:none}
+.lrank{width:16px;font-size:11px;font-weight:700;color:#888;text-align:center;flex-shrink:0}
+.lname{flex:1;font-size:11px}
+.lscore{font-size:11px;font-weight:700;color:#2E7D32}
+.lpct{font-size:10px;color:#888;min-width:28px;text-align:right}
+.volet-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.volet-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.5rem}
+.volet-btn{border:1px solid #D0D0D0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:500;cursor:pointer;background:#fff;color:#555;display:flex;align-items:center;gap:4px;transition:all .15s}
+.volet-btn.act{color:#fff}
+.volet-badge{font-size:9px;background:rgba(0,0,0,.08);border-radius:10px;padding:1px 5px}
+.volet-btn.act .volet-badge{background:rgba(255,255,255,.25)}
+.disc-label{font-size:10px;color:#AAA;margin-bottom:.25rem}
+.disc-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.55rem}
+.disc-btn{border:1px solid #D0D0D0;border-radius:14px;padding:3px 8px;font-size:10px;cursor:pointer;background:#F5F5F5;color:#555;transition:all .15s}
+.disc-btn.act{color:#fff;border-color:transparent}
+.sec-banner{padding:.35rem .7rem;border-radius:7px;font-size:11px;font-weight:600;margin-bottom:.4rem;display:flex;align-items:center;gap:5px}
+.qcard{background:#fff;border:1px solid #E0E0E0;border-radius:12px;padding:.8rem .9rem;margin-bottom:.45rem}
+.qinner{display:flex;gap:0}
+.stripe{width:3px;border-radius:2px;flex-shrink:0;align-self:stretch;min-height:40px;margin-right:8px}
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:.45rem}
+.qmeta{display:flex;gap:3px;flex-wrap:wrap;align-items:center}
+.badge{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:500}
+.b-regl{background:#E3F2FD;color:#1565C0}
+.b-sci{background:#E8F5E9;color:#2E7D32}
+.b-tech{background:#FFF3E0;color:#E65100}
+.b-entr{background:#F3E5F5;color:#6A1B9A}
+.b-conn{background:#F5F5F5;color:#555}
+.b-appl{background:#FFFDE7;color:#F57F17}
+.b-anal{background:#FFEBEE;color:#C62828}
+.b-done{background:#E8F5E9;color:#2E7D32}
+.b-part{background:#FFF8E1;color:#F57F17}
+.tmr{font-size:10px;color:#AAA;flex-shrink:0;font-variant-numeric:tabular-nums}
+.tmr.warn{color:#E65100}.tmr.red{color:#C62828}
+.qtext{font-size:13px;line-height:1.65;padding:.6rem .7rem;background:#F8F9FA;border-radius:8px;margin-bottom:.4rem}
+.qsub{font-size:10px;color:#AAA;margin-bottom:.25rem}
+textarea{width:100%;min-height:85px;border:1px solid #D0D0D0;border-radius:8px;padding:.5rem;font-size:12px;font-family:inherit;resize:vertical;line-height:1.5}
+textarea:focus{outline:none;border-color:#1A5276}
+.btn-row{display:flex;gap:5px;margin-top:.35rem}
+.qbtn{border:1px solid #D0D0D0;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:500;cursor:pointer;background:#fff;color:#444;transition:all .15s}
+.qbtn:hover{background:#F5F5F5}
+.qbtn-pri{background:#1A5276!important;color:#fff!important;border-color:#1A5276!important}
+.corr{background:#F1F8E9;border:1px solid #A5D6A7;border-radius:8px;padding:.6rem;margin-top:.35rem}
+.corr-t{font-size:10px;font-weight:700;color:#2E7D32;margin-bottom:.25rem}
+.corr-item{font-size:11px;padding:2px 0;line-height:1.5;display:flex;gap:5px}
+.cd{color:#2E7D32;flex-shrink:0}
+.self-ev{margin-top:.35rem;padding:.5rem;background:#F5F5F5;border-radius:8px}
+.sel-t{font-size:10px;color:#666;margin-bottom:.25rem;font-weight:600}
+.ev-row{display:flex;gap:4px}
+.ev-btn{flex:1;padding:5px;font-size:11px;font-weight:500;border-radius:7px;cursor:pointer;border:1px solid #D0D0D0}
+.ev0{background:#FFEBEE;color:#C62828;border-color:#FFCDD2}
+.ev1{background:#FFFDE7;color:#F57F17;border-color:#FFF9C4}
+.ev2{background:#E8F5E9;color:#2E7D32;border-color:#C8E6C9}
+.ev-btn:hover{opacity:.8}
+.empty{text-align:center;padding:1.5rem;color:#AAA;font-size:12px}
+
+/* ═══ ERGONOMIE MOBILE — tailles agrandies ═══ */
+@media (max-width:560px){
+  .wrap{padding:.5rem}
+  .conform-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px}
+  .topbar{flex-wrap:wrap;gap:6px;padding:.6rem .75rem}
+  .topbar-title{font-size:13px;flex:1 1 100%;order:-1;margin-bottom:2px}
+  .uname{display:none}
+  .avatar{font-size:11px}
+  .mod-row{gap:5px}
+  .mod-btn{padding:7px 11px;font-size:12px;flex:1 1 auto;justify-content:center}
+  .mod-btn span{font-size:10px!important}
+  .conform-title{font-size:11px}
+  .cv-label{font-size:11px}
+  .cv-count{font-size:11px}
+  .volet-label{font-size:11px}
+  .volet-row{gap:5px}
+  .volet-btn{padding:7px 10px;font-size:12px;flex:1 1 auto;justify-content:center}
+  .volet-badge{font-size:10px}
+  .disc-label{font-size:11px}
+  .disc-row{gap:5px}
+  .disc-btn{font-size:12px;padding:5px 10px}
+  .sec-banner{font-size:12px;padding:.45rem .7rem}
+  .qcard{padding:.8rem .7rem}
+  .qtext{font-size:15px;padding:.65rem .7rem;line-height:1.6}
+  .qsub{font-size:11px}
+  .qmeta{gap:3px}
+  .badge{font-size:11px;padding:2px 7px}
+  .tmr{font-size:11px}
+  textarea{font-size:15px;min-height:100px;padding:.6rem}
+  .btn-row{flex-wrap:wrap;gap:6px}
+  .qbtn{flex:1 1 auto;text-align:center;padding:9px 10px;font-size:13px}
+  .corr-t{font-size:11px}
+  .corr-item{font-size:13px}
+  .sel-t{font-size:11px}
+  .ev-btn{font-size:12px;padding:8px 4px}
+  .auth-box{padding:1.5rem 1.2rem}
+  .auth-title{font-size:18px}
+  .auth-sub{font-size:13px}
+  .field label{font-size:12px}
+  .field input,.field select{font-size:15px;padding:10px 12px}
+  .btn{font-size:15px;padding:11px}
+  .stat{padding:.55rem .5rem}
+  .sv{font-size:18px}
+  .sl{font-size:11px}
+}
+@media (max-width:380px){
+  .conform-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .mod-btn{font-size:11px;padding:6px 9px}
+  .badge{font-size:10px;padding:2px 6px}
+  .volet-btn{font-size:11px;padding:6px 8px}
+  .qtext{font-size:15px}
+  textarea{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- APP (accès direct, sans connexion ni validation) -->
+<div id="app-screen">
+<div class="wrap">
+  <div class="topbar">
+    <div class="topbar-logo">🏃</div>
+    <div class="topbar-title">QRR — APS · Espace Étudiant</div>
+    <div class="avatar" id="u-av">ET</div>
+    <span class="uname" id="u-lbl">Étudiant</span>
+  </div>
+  <div class="mod-row" id="mod-row"></div>
+  <div class="conform-box" id="conform-box"></div>
+  <div class="stats">
+    <div class="stat"><div class="sv" id="s-done">0</div><div class="sl">Traitées</div></div>
+    <div class="stat"><div class="sv" id="s-ok" style="color:#2E7D32">0</div><div class="sl">Maîtrisées</div></div>
+    <div class="stat"><div class="sv" id="s-part" style="color:#E65100">0</div><div class="sl">En cours</div></div>
+    <div class="stat"><div class="sv" id="s-pct">0%</div><div class="sl">Progression</div></div>
+  </div>
+  <div class="pb-wrap"><div class="pb-fill" id="pb" style="width:0%"></div></div>
+  <div class="volet-label">Volet d'évaluation</div>
+  <div class="volet-row" id="volet-row"></div>
+  <div class="disc-label" id="disc-label">Discipline</div>
+  <div class="disc-row" id="disc-row"></div>
+  <div id="q-list"></div>
+</div>
+</div>
+
+<script>
+const API   = "https://script.google.com/macros/s/AKfycbxVhGntDsKLBhVYAzImkIvit5EGJv-Kx3GJ0XIZdjoHBBQCzxejm1mFAwZmYBppX2I/exec";
+const TOKEN = "QRR-CRMEFSM-2026-SECURE";
+
+const VOLETS = [
+  {id:"Toutes",       col:"#1A1A1A", bg:"#F5F5F5", icon:"📋"},
+  {id:"Réglementaire",col:"#1565C0", bg:"#E3F2FD", icon:"📖"},
+  {id:"Scientifique", col:"#2E7D32", bg:"#E8F5E9", icon:"🔬"},
+  {id:"Technique",    col:"#E65100", bg:"#FFF3E0", icon:"⚙️"},
+  {id:"Entraînement", col:"#6A1B9A", bg:"#F3E5F5", icon:"🏋️"},
+];
+const VCOL = {"Réglementaire":"#1565C0","Scientifique":"#2E7D32","Technique":"#E65100","Entraînement":"#6A1B9A"};
+const VBG  = {"Réglementaire":"#E3F2FD","Scientifique":"#E8F5E9","Technique":"#FFF3E0","Entraînement":"#F3E5F5"};
+
+const MODULES = [
+  {id:"ath",label:"Athlétisme",        color:"#1A5276",
+   discs:["Toutes","Course de vitesse","Course de durée","Courses de haies","Courses de relais","Saut en longueur","Saut en hauteur","Triple saut"]},
+  {id:"sc", label:"Sports Collectifs", color:"#1E8449",
+   discs:["Toutes","Handball","Basketball","Football","Entraînement"]},
+  {id:"vb", label:"Volleyball",        color:"#784212",
+   discs:["Toutes","Règlement","Technique","Tactique","Entraînement"]},
+  {id:"gas",label:"Gymnastique (GAS)", color:"#6C3483",
+   discs:["Toutes","Règlement GAS","Scientifique GAS","Technique GAS","Entraînement GAS"]},
+];
+
+const QUESTIONS = [
+{id:"a1",mod:"ath",disc:"Course de vitesse",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelles courses de sprint nécessitent un départ en starting-blocks ? Citez la règle concernant le faux départ en vigueur depuis 2010.",rep:["Starting-blocks obligatoires : 100m, 200m, 400m, relais jusqu'au 4×400m, 100/110m haies", "Règle du faux départ depuis 2010 : tout faux départ = disqualification immédiate de l'athlète responsable (tolérance zéro)", "Limite de temps de réaction : 100ms — en dessous, le départ est automatiquement déclaré faux", "Signal : coup de pistolet de rappel + carton rouge-noir brandi par le starter (World Athletics Art. 162)"]},
+{id:"a2",mod:"ath",disc:"Course de vitesse",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"En finale du 200m, un coureur de la couloir 3 marche dans le couloir 4 lors du premier virage. L'arbitre siffle. Quelle sanction s'applique et dans quelle condition peut-elle être levée ?",rep:["Sortie délibérée du couloir = disqualification (DQ)", "La DQ peut être annulée si la sortie a été causée par la faute d'un autre concurrent (poussée, gêne involontaire)", "Si la sortie n'a procuré aucun avantage ET n'a pas gêné d'autre coureur : le juge-arbitre peut ne pas DQ", "Règle : le coureur doit rester dans son couloir du départ jusqu'à la ligne d'arrivée (Art. 163.2)"]},
+{id:"a3",mod:"ath",disc:"Course de vitesse",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les trois systèmes énergétiques sollicités en sprint. Quel système domine dans le 100m ? Dans le 400m ?",rep:["Anaérobie alactique (ATP-PC) : 0–10 s, puissance max, pas de lactate produit", "Anaérobie lactique (glycolyse anaérobie) : 10–90 s, production rapide d'ATP avec accumulation de lactate", "Aérobie (oxydatif) : > 90 s, oxidation des glucides et lipides, fatigabilité lente", "100m : dominante anaérobie alactique (~85-90%)", "400m : dominante anaérobie lactique (~65%) + aérobie (~30%) + alactique (~5%)"]},
+{id:"a4",mod:"ath",disc:"Course de vitesse",volet:"Scientifique",niv:"Analyser",pts:3,q:"Analysez les adaptations physiologiques produites par l'entraînement en course de vitesse sur le processus anaérobie alactique. Quelles implications cela a-t-il sur la programmation des séances ? (D'après Hubiche & Pradet)",rep:["Adaptations au niveau musculaire : (1) élévation du stock de créatine-phosphate intramusculaire, (2) augmentation de l'activité des enzymes ATPase et créatine-kinase, (3) amélioration de la vitesse de conduction neuromusculaire", "Adaptations au niveau nerveux : diminution du seuil d'excitabilité des fibres rapides (FT IIb)", "Implications pratiques : les séances alactiques doivent être COURTES (5-10s), à intensité MAXIMALE, avec récupération COMPLÈTE (3-5 min) pour reconstituer les stocks de CP", "Erreur à éviter : mélanger le travail alactique et lactique dans la même séance → dégrade la qualité des deux processus", "Source : Hubiche & Pradet — Principes de développement des processus énergétiques"]},
+{id:"a5",mod:"ath",disc:"Course de vitesse",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 4 phases de la course de sprint sur 100m avec l'objectif biomécanique de chacune.",rep:["Phase 1 – Départ (0-10m) : production maximale de force horizontale depuis les blocks, corps incliné à ~45°", "Phase 2 – Accélération (10-40m) : augmentation progressive de la fréquence et de l'amplitude de foulée, redressement progressif du tronc", "Phase 3 – Vitesse maximale (40-70m) : maintien de la puissance, fréquence gestuelle à son apogée (~4-5 Hz en élite)", "Phase 4 – Résistance à la vitesse (70-100m) : limitation de la décélération due à l'accumulation de fatigue neuromusculaire"]},
+{id:"a6",mod:"ath",disc:"Course de vitesse",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Définissez la fréquence de foulée et l'amplitude de foulée. Expliquez leur relation avec la vitesse de course.",rep:["Fréquence de foulée = nombre de foulées par seconde (Hz ou pas/s)", "Amplitude de foulée = distance parcourue entre deux appuis successifs (m)", "Vitesse = Fréquence × Amplitude (relation multiplicative de Hay, 1993)", "Exemple : un sprinteur à 10 m/s avec f=4,5 Hz a une amplitude = 10/4,5 = 2,22 m", "Chez le débutant : priorité à l'amplitude (poussée insuffisante) avant la fréquence (risque de piétinement)"]},
+{id:"a7",mod:"ath",disc:"Course de vitesse",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez la position 'à vos marques' et 'prêts' en starting-blocks. Quels sont les angles articulaires recommandés ?",rep:["À vos marques : mains à largeur d'épaules, bras tendus, regard vers le bas, fesses au niveau ou légèrement en dessous des épaules", "Prêts : hanches montées 10-15 cm au-dessus des épaules, poids transféré sur les mains et avant-pieds", "Angles recommandés : jambe avant ~90° (genou), jambe arrière ~120-135°, buste à ~25-35° par rapport à l'horizontale", "Le départ est déclenché par l'extension simultanée et explosive des deux jambes + lancer des bras en contra-rotation"]},
+{id:"a8",mod:"ath",disc:"Course de vitesse",volet:"Technique",niv:"Appliquer",pts:2,q:"Un élève de 3ème présente un redressement trop rapide dès 5m et des foulées courtes en milieu de course. Identifiez les erreurs et proposez un exercice correctif pour chacune.",rep:["Erreur 1 – Redressement précoce : extension trop rapide du tronc → perte de l'angle de poussée horizontale → Exercice : course sous corde tendue à 1m sur 15m, accent sur l'inclinaison avant du buste", "Erreur 2 – Foulées courtes : insuffisance de la poussée de la jambe arrière → Exercice : bondissements sur haies basses (30 cm), accent sur l'extension complète de la cheville et du genou à chaque bond", "Critère de réussite : corps incliné à ~45° pendant les 10 premiers mètres, contact sol réduit (phase de vol visible)"]},
+{id:"a9",mod:"ath",disc:"Course de vitesse",volet:"Technique",niv:"Analyser",pts:3,q:"Analysez la relation entre fréquence et amplitude de foulée dans la performance en sprint. Quel paramètre prioriser selon le niveau du coureur et pourquoi ?",rep:["Vitesse = Fréquence × Amplitude : les deux paramètres contribuent à la vitesse mais de façon différente selon le niveau", "Chez le débutant : l'amplitude est le facteur limitant (manque de force propulsive, poussée incomplète) → prioriser l'amplitude via la musculation et les exercices de poussée", "Chez le coureur intermédiaire : les deux paramètres atteignent des valeurs utilisables → travailler les deux", "Chez l'athlète avancé : la fréquence devient le facteur différenciant (les grands sprinteurs ont des amplitudes similaires mais des fréquences légèrement supérieures)", "Erreur classique : travailler la fréquence (skipping rapide) sans base d'amplitude → foulées 'piétinantes' inefficaces", "Conclusion pédagogique : amplitude d'abord, fréquence ensuite"]},
+{id:"a10",mod:"ath",disc:"Course de vitesse",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Citez les 4 qualités physiques déterminantes de la performance en sprint et justifiez l'importance de chacune.",rep:["1. Puissance musculaire maximale : force × vitesse de contraction des extenseurs (quadriceps, fessiers, triceps sural)", "2. Réactivité neuromusculaire : temps de réponse nerf → muscle, conditionne la vitesse de départ", "3. Coordination musculaire : synchronisation des chaînes agoniste/antagoniste pour éviter les freins internes", "4. Résistance à la vitesse (capacité lactique) : maintien de la Vmax sur 300-400m malgré l'accumulation de lactate"]},
+{id:"a11",mod:"ath",disc:"Course de vitesse",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Planifiez une séance de 45 min dédiée au développement de la vitesse-réaction et de l'accélération pour des collégiens de 14 ans.",rep:["Objectif : améliorer le temps de réaction et l'efficacité sur les 0-20m", "Échauffement (10 min) : trot + mobilisation articulaire + 3× éducatifs (montées genoux, talons-fesses, foulées bondissantes)", "Partie principale (28 min) : Bloc 1 — 4× départ réaction sur signal sonore (15m), récup 90s | Bloc 2 — 4× sprint accélération (25m) depuis position haute, récup 2 min | Bloc 3 — 3× course en résistance (élastique ou côte 5%), 30m", "Retour au calme (7 min) : marche + étirements statiques ischio-jambiers, quadriceps, triceps sural", "Principes : efforts courts (<10s), intensité max, récupération complète, maximum 20-25 min de travail effectif"]},
+{id:"a12",mod:"ath",disc:"Course de vitesse",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Comment organiser le développement de la vitesse en cycle annuel scolaire ? Proposez 3 périodes avec des objectifs distincts.",rep:["Période 1 – Fondation physique (oct.–déc.) : renforcement musculaire général, travail de coordination, éducatifs athlétiques sans vitesse max", "Période 2 – Développement technique (janv.–mars) : travail de la technique de course (starts, accélération), jeux de vitesse, intensité 85-95%", "Période 3 – Compétition et performance (avr.–juin) : séances courtes à 100% d'intensité, maintien de la fraîcheur musculaire, compétitions", "Principe général : ne pas travailler la vitesse pure >2 séances/semaine pour éviter la fatigue du SNC"]},
+{id:"a13",mod:"ath",disc:"Course de durée",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les règles de départ pour le 800m et pour le 1500m. En quoi diffèrent-elles ?",rep:["800m : départ en couloirs séparés, les coureurs restent en couloir jusqu'à la fin du premier virage (break-line), puis se regroupent librement (règle depuis 2005)", "1500m : départ debout sur une ligne commune, pas de couloirs, regroupement immédiat autorisé", "3000m et plus : même principe que 1500m, départ debout sur ligne commune", "Condition de DQ : gêne délibérée ou conduite antisportive sur décision du juge-arbitre"]},
+{id:"a14",mod:"ath",disc:"Course de durée",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Lors d'un 1500m scolaire, un concurrent pousse délibérément un adversaire à 500m de l'arrivée. Décrivez la procédure du juge-arbitre et la sanction possible.",rep:["Le juge-arbitre peut DQ le coureur fautif pour conduite antisportive (Art. 163.3)", "Procédure : le juge de couloir signale la faute, le juge-arbitre consulte les juges témoins et examine les images si disponibles", "Options de sanction : DQ (disqualification), avertissement officiel, ou pas de sanction si la faute n'est pas prouvée", "Si la victime est tombée ou a été pénalisée : possibilité de la qualifier d'office selon le règlement de la compétition scolaire", "En compétition scolaire OSFCE : décision souveraine du juge-arbitre en conformité avec le règlement FFA/World Athletics"]},
+{id:"a15",mod:"ath",disc:"Course de durée",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Définissez le VO₂max et le seuil anaérobie. Comment ces deux paramètres influencent-ils la performance en course de durée ?",rep:["VO₂max = volume maximal d'O₂ consommé par minute par kg de masse corporelle (mL/min/kg) — indicateur de la puissance aérobie maximale", "Seuil anaérobie = intensité à partir de laquelle le lactate s'accumule (déséquilibre production/élimination) — repère à ~4 mmol/L ou ~85-90% FCmax", "Performance en course de durée déterminée par : (1) VO₂max élevé, (2) seuil anaérobie proche du VO₂max, (3) économie de course (O₂ consommé à une allure donnée)", "Entraîner le seuil anaérobie → courir plus vite sans accumuler de lactate → performance améliorée"]},
+{id:"a16",mod:"ath",disc:"Course de durée",volet:"Scientifique",niv:"Analyser",pts:3,q:"D'après Hubiche & Pradet, quels sont les principes de développement du processus aérobie ? Analysez les deux pôles à développer et leurs méthodes d'entraînement respectives.",rep:["Deux pôles du processus aérobie : CAPACITÉ (volume total d'O₂ pouvant être traité en continu) et PUISSANCE (intensité maximale = VO₂max)", "Développement de la CAPACITÉ : efforts continus à 60-75% VO₂max, durée 20-60 min, favorise le nombre de mitochondries et la capillarisation", "Développement de la PUISSANCE : efforts fractionnés à 90-100% VO₂max, durée par répétition 2-5 min, récup 1:1, améliore le débit cardiaque maximal", "Modifications physiologiques supposées : augmentation des enzymes oxydatives (citrate synthase, SDH), augmentation de l'utilisation des acides gras, augmentation du volume d'éjection systolique", "Principe de Hubiche & Pradet : ne pas saturer un seul pôle — alterner capacité et puissance en période de construction"]},
+{id:"a17",mod:"ath",disc:"Course de durée",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les caractéristiques techniques de la course de durée qui la distinguent du sprint ? Décrivez la posture, la foulée et la gestion de l'allure.",rep:["Posture : légère inclinaison vers l'avant du tronc, bras fléchis à ~90° en balanciers détendus (économie d'énergie), regard horizontal", "Foulée : moins ample que le sprint, contact au sol plus long (appui actif), fréquence modérée (2,5-3,5 Hz)", "Attaque du sol : plutôt à plat ou talon-pointe selon l'allure (talon pour le fond lent, avant-pied pour les allures rapides)", "Gestion de l'allure : régularité (allure constante ou légèrement progressif), éviter les accélérations prématurées"]},
+{id:"a18",mod:"ath",disc:"Course de durée",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Définissez l'endurance selon Hubiche & Pradet. En quoi cette définition dépasse-t-elle la simple notion d'effort aérobie ?",rep:["Endurance = faculté d'exprimer des actions motrices pendant une durée maximale (Hubiche & Pradet)", "Cette définition n'est pas restreinte aux processus aérobies : on peut parler d'endurance de vitesse (maintien de la Vmax sur 150-200m) qui mobilise des filières mixtes", "L'endurance dépend de la durée ET de l'intensité : il existe des endurances spécifiques à chaque type d'effort", "Conséquence : la course de durée développe différentes formes d'endurance selon l'allure travaillée"]},
+{id:"a19",mod:"ath",disc:"Course de durée",volet:"Technique",niv:"Appliquer",pts:2,q:"Un élève de 3ème part trop vite en 1500m et s'effondre à 700m. Analysez les causes et proposez une stratégie de course adaptée.",rep:["Cause : départ au-dessus du seuil anaérobie → accumulation lactique rapide → acidose musculaire précoce", "Stratégie recommandée : allure régulière ou légèrement progressive (negative split) ; les 3 premiers 400m à 90-95% de l'allure cible", "Exercice de régulation : 3× 400m à allure contrôlée avec chronomètre (retour visuel immédiat) + auto-évaluation de l'effort perçu", "Règle pratique : si l'élève ne peut plus parler, il est trop vite → ajuster le rythme immédiatement"]},
+{id:"a20",mod:"ath",disc:"Course de durée",volet:"Technique",niv:"Appliquer",pts:2,q:"Proposez une progression sur 6 séances pour développer l'endurance aérobie d'élèves débutants. Précisez les critères de passage d'une séance à la suivante.",rep:["Séance 1 : 10 min de course continue à allure 'conversation' — critère : finir sans s'arrêter", "Séance 2 : 12 min avec 2× accélération de 30s — critère : maintien de l'allure de base entre les accélérations", "Séance 3 : 3× 5 min à allure modérée, récup 2 min — critère : les 3 séquences à la même vitesse", "Séance 4 : 15 min continus avec variation progressive du rythme — critère : finir légèrement plus vite que le début", "Séance 5 : 18 min continus — critère : capacité à maintenir une conversation les 10 premières minutes", "Séance 6 : test de 6 min (distance max) — indicateur de progression mesurable"]},
+{id:"a21",mod:"ath",disc:"Course de durée",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Citez les 4 qualités physiques prioritaires en course de durée et expliquez comment les développer en contexte scolaire.",rep:["1. Endurance aérobie (VO₂max) : course continue 15-20 min + fractionné long 3-5 min", "2. Endurance au seuil anaérobie : allure soutenue 8-15 min légèrement inconfortable (peut parler avec difficulté)", "3. Force-endurance musculaire des membres inférieurs : montées de côtes, bondissements sur longue durée", "4. Économie de course : travail technique (posture, foulée) pour réduire le coût énergétique à une allure donnée"]},
+{id:"a22",mod:"ath",disc:"Course de durée",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Comment évaluer l'endurance en milieu scolaire ? Décrivez 2 tests adaptés au collège avec leurs avantages, limites et barèmes indicatifs.",rep:["Test 1 — Navette (Léger-Boucher) : paliers progressifs de 20m au bip sonore → estimation du VMA — Avantages : collectif, progressif, motivant | Limites : nécessite matériel sonore, stressant pour les moins sportifs", "Test 2 — Course de 6 min ou 12 min (Cooper) : distance maximale parcourue — Avantages : simple, résultat concret en mètres, applicable sans équipement | Limites : résultat sensible à la motivation, risque si non préparé", "Barèmes indicatifs (12 min, garçon 14 ans) : Très bien > 2800m | Bien 2400-2800m | Assez bien 2000-2400m | Insuffisant < 2000m", "Recommandation : privilégier les tests progressifs pour la sécurité et introduire les tests max uniquement après 4-6 semaines de préparation"]},
+{id:"a23",mod:"ath",disc:"Courses de haies",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Donnez les dimensions officielles des haies et les distances réglementaires pour le 110m haies hommes.",rep:["Hauteur haies 110mH hommes : 1,067 m | 100mH femmes : 0,838 m | 400mH H : 0,914 m | 400mH F : 0,762 m", "110mH hommes : distance départ-1ère haie = 13,72m | inter-haies = 9,14m | dernière haie-arrivée = 14,02m", "Nombre de haies : 10 dans toutes les épreuves de haies", "Poids de la haie : ≥ 10 kg ; conçue pour basculer avec une force de 3,6 kg (8 lbs) sur le bord supérieur"]},
+{id:"a24",mod:"ath",disc:"Courses de haies",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Lors d'un 110mH, un coureur traîne volontairement sa jambe libre horizontalement à l'extérieur de son couloir. L'arbitre siffle. Citez la faute, la sanction et le texte réglementaire.",rep:["Faute : jambe ou pied de la jambe libre franchissant la haie côté extérieur du couloir = disqualification", "Motif : avantage illicite sur la haie (trajectoire réduite) ou gêne potentielle du coureur adjacent", "Sanction : DQ immédiate (carton rouge) signalée par le juge de haies attitré à ce couloir", "Texte : World Athletics Rule 168.7 — 'Un concurrent sera disqualifié si : sa jambe ou son pied passe latéralement à côté d'une haie ou la franchit à l'extérieur'", "À distinguer : renverser une haie involontairement = PAS une faute (la haie est conçue pour basculer)"]},
+{id:"a25",mod:"ath",disc:"Courses de haies",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Expliquez la problématique biomécanique du franchissement des haies : pourquoi la haie est-elle à la fois un obstacle à surmonter et une source de freinage ?",rep:["La haie impose une modification de la trajectoire du centre de masse (CM) : élévation verticale nécessaire = perte d'énergie cinétique horizontale", "Plus la trajectoire est haute (saut élevé), plus la décélération est importante → objectif : maintenir une trajectoire rasante", "Freinage au moment de l'appel devant la haie : la jambe d'appui se place en avant du CM → frein = 'negative foot contact' (Hubiche & Pradet)", "Objectif technique : réduire au maximum le temps au sol et l'élévation du CM pour conserver la vitesse de course"]},
+{id:"a26",mod:"ath",disc:"Courses de haies",volet:"Scientifique",niv:"Analyser",pts:3,q:"Analysez pourquoi la vitesse de course conditionne fondamentalement la technique de franchissement. Pourquoi est-il impossible de perfectionner la technique à basse vitesse uniquement ?",rep:["À haute vitesse : la haie est 'traversée' par un franchissement rasant (angle d'attaque faible, corps incliné) car l'élan horizontal impose la trajectoire", "À basse vitesse : la haie est 'sautée' (trajectoire verticale haute) car le coureur manque d'élan pour maintenir un franchissement rasant", "Timing de la jambe d'attaque : fondamentalement différent selon la vitesse d'approche → les automatismes appris à basse vitesse ne se transfèrent pas à haute vitesse", "Conséquence pédagogique : la technique DOIT être progressivement rapprochée de la vitesse compétitive", "Méthode : haies basses → technique lente → monter progressivement la hauteur ET la vitesse conjointement, pas séparément"]},
+{id:"a27",mod:"ath",disc:"Courses de haies",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 3 phases du franchissement d'une haie et le rôle des bras dans ce geste.",rep:["Phase 1 – Attaque : jambe d'attaque s'élance tendue ou légèrement fléchie vers la haie, tronc incliné vers l'avant (~15-20°)", "Phase 2 – Passage : jambe d'attaque passe au-dessus, jambe libre (récupération) se replie à l'extérieur en rasant horizontalement", "Phase 3 – Réception et reprise : atterrissage sur l'avant-pied de la jambe d'attaque, la jambe libre se repositionne devant pour la foulée suivante", "Rôle des bras : bras opposé à la jambe d'attaque s'avance pour l'équilibre ; bras homolatéral part en arrière pour contrer la rotation du tronc vers la haie"]},
+{id:"a28",mod:"ath",disc:"Courses de haies",volet:"Technique",niv:"Appliquer",pts:2,q:"Un hurdler débutant 'saute par-dessus' les haies (trajectoire trop haute). Identifiez les 2 causes principales et proposez 2 exercices correctifs.",rep:["Cause 1 : jambe d'attaque lancée trop verticalement (manque d'extension horizontale) → Exercice : franchissement d'une haie surmontée d'une corde élastique à 30 cm au-dessus → forcer la trajectoire rasante", "Cause 2 : tronc trop vertical (pas d'inclinaison vers l'avant) → Exercice : drill d'attaque jambe tendue sur haies très basses (40 cm) en exagérant l'inclinaison du buste", "Critère de réussite : hauteur maximale du CM au-dessus de la haie ne dépasse pas 5-10 cm"]},
+{id:"a29",mod:"ath",disc:"Courses de haies",volet:"Technique",niv:"Appliquer",pts:2,q:"En 400m haies, pourquoi la gestion du nombre de foulées inter-haies est-elle cruciale ? Proposez une stratégie adaptée à un lycéen débutant.",rep:["En élite : 13 foulées entre haies en début de course → passage à 14-15 en fin de course (fatigue)", "Le changement de nombre de foulées oblige à modifier la jambe d'attaque → travailler les 2 jambes est indispensable", "Pour lycéen débutant : 15-17 foulées est réaliste ; choisir le même nombre JUSQU'À LA 7ème haie pour maintenir un rythme régulier", "Stratégie : départ contrôlé (≠ 400m plat), gestion de la réserve musculaire pour maintenir le nombre de foulées, accélération sur la ligne droite finale entre la 10ème haie et l'arrivée"]},
+{id:"a30",mod:"ath",disc:"Courses de haies",volet:"Technique",niv:"Analyser",pts:3,q:"Comparez les exigences techniques du 110m haies et du 400m haies. Quels principes d'entraînement sont communs et quels sont les spécificités de chaque épreuve ?",rep:["110mH : vitesse maximale + technique de franchissement répété à rythme fixe (3 foulées inter-haies imposées) + puissance explosive", "400mH : gestion de l'énergie sur 400m + technique de franchissement malgré la fatigue + adaptabilité des 2 jambes", "Principes communs : maîtrise du franchissement (jambe d'attaque tendue, jambe libre rasante), musculation des fléchisseurs de hanche, travail technique sur haies", "Spécificités 110mH : développement de la réactivité, fréquence gestuelle haute, travail en couloir strict", "Spécificités 400mH : endurance spécifique (3× 200m haies, par ex.), travail obligatoire jambe non dominante, préparation à la gestion de la fatigue sur le franchissement"]},
+{id:"a31",mod:"ath",disc:"Courses de haies",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Quelles qualités physiques spécifiques doit développer un hurdler ? Classez-les par ordre d'importance.",rep:["1. Vitesse de base (sprint) : la performance en haies est d'abord une course de vitesse", "2. Souplesse des hanches et des ischios : condition technique pour le passage de la jambe libre", "3. Force explosive (fléchisseurs de hanche, quadriceps) : puissance de la jambe d'attaque et de l'appel", "4. Réactivité au sol : temps de contact réduit entre les haies (phase d'appui bref)", "5. Coordination dynamique : synchronisation bras-jambes lors du franchissement"]},
+{id:"a32",mod:"ath",disc:"Courses de haies",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez une situation d'apprentissage progressive pour introduire le franchissement des haies à des débutants n'ayant jamais pratiqué. Précisez les étapes et les critères de sécurité.",rep:["Étape 1 : franchissement de lignes au sol tracées à la craie (distance inter-lignes = distance inter-haies) → prise de conscience du rythme des foulées", "Étape 2 : franchissement de haies très basses (30-40 cm) à vitesse réduite → focus sur la technique de la jambe d'attaque et de la jambe libre", "Étape 3 : augmentation progressive de la hauteur (50, 60, 75 cm) ET de la vitesse d'approche simultanément", "Sécurité : haies basculantes obligatoires, espace latéral ≥ 1m entre couloirs, ne jamais sauter en reculant, stop si chute", "Critère pédagogique : ne pas augmenter la hauteur avant que la technique soit stabilisée à la hauteur inférieure"]},
+{id:"a33",mod:"ath",disc:"Courses de relais",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelle est la longueur de la zone de transmission en relais ? Un relayeur peut-il commencer à courir avant d'entrer dans cette zone ?",rep:["Zone de transmission : 20 mètres", "Le relayeur peut commencer à courir AVANT la zone (élan autorisé, hors zone)", "Le témoin DOIT être transmis à l'intérieur des 20m de la zone de transmission", "Transmission hors zone = disqualification de l'équipe (World Athletics Art. 163.3)"]},
+{id:"a34",mod:"ath",disc:"Courses de relais",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"En 4×100m, l'équipe A transmet le témoin 3m après la fin de la zone. L'arbitre hésite car le relayeur avait commencé à courir avant la zone. Expliquez la décision réglementaire.",rep:["La décision est sans appel : DQ de l'équipe A", "Ce qui compte c'est l'endroit où LE TÉMOIN change de main — pas où se trouvaient les coureurs", "Le fait que le relayeur ait commencé à courir avant la zone est légal (élan pré-zone autorisé)", "Mais le passage du témoin doit impérativement se faire dans les 20m de la zone de transmission, peu importe la position des corps", "Référence : World Athletics Art. 163.3 — 'le témoin doit être transmis à l'intérieur de la zone de transmission'"]},
+{id:"a35",mod:"ath",disc:"Courses de relais",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Quelles ressources physiologiques spécifiques mobilise le 4×100m par rapport à un 100m individuel ? Justifiez.",rep:["Le 4×100m mobilise les mêmes ressources que le 100m (anaérobie alactique dominant) mais avec des exigences supplémentaires :", "Ressource supplémentaire 1 : coordination fine (synchronisation donneur-preneur) → ressource cognitive et motrice", "Ressource supplémentaire 2 : réactivité au signal de transmission (déclencher le sprint sur un signal tactile/visuel indirect)", "Ressource supplémentaire 3 : prise de décision en temps réel (évaluer la vitesse d'approche du partenaire)", "Avantage du relais : le coureur reçoit le témoin en courant → potentiellement plus vite que son propre départ (pas de starting-block à froid)"]},
+{id:"a36",mod:"ath",disc:"Courses de relais",volet:"Scientifique",niv:"Analyser",pts:3,q:"Analysez pourquoi une équipe de 4 coureurs techniquement bien formés peut battre une équipe de 4 coureurs individuellement plus rapides. Appuyez-vous sur des données chiffrées.",rep:["Principe : chaque transmission réussie en aveugle permet de maintenir la vitesse maximale → gain de 3-5m par passage", "Sur 3 passages : gain potentiel de 9-15m, soit l'équivalent de 0,9s à 1,5s au niveau scolaire", "Si 4 coureurs ont 11,5s individuel chacun → potentiel théorique 4×100m = 46,0s", "Avec 3 passages parfaits (gain 12m = 1,2s) → chrono réel ≈ 44,8s", "Une équipe de coureurs à 11,2s mais avec passages médiocres (perte 10m = 1,0s) → chrono réel ≈ 44,8 + 1,0 = 45,8s", "Conclusion : la technique de transmission est aussi importante que la vitesse individuelle"]},
+{id:"a37",mod:"ath",disc:"Courses de relais",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 2 styles de transmission du témoin (passage en aveugle et passage en vue). Quand utilise-t-on chacun ?",rep:["Passage en aveugle (poussée) : le preneur tend le bras vers l'arrière paume vers le bas, le donneur place le témoin de bas en haut → utilisé en 4×100m (haute vitesse, aucun regard en arrière autorisé)", "Passage en vue (retournement) : le preneur se retourne légèrement pour voir le témoin arriver, réception paume vers le haut → utilisé en 4×400m ou par débutants", "Avantage passage en aveugle : aucun ralentissement du preneur → meilleur maintien de la vitesse", "Inconvénient : exige beaucoup d'entraînement et de confiance entre partenaires"]},
+{id:"a38",mod:"ath",disc:"Courses de relais",volet:"Technique",niv:"Appliquer",pts:2,q:"La marque de départ du relayeur est mal placée : il atteint sa vitesse max et attend le donneur. Analysez le problème et proposez une procédure de correction.",rep:["Problème : la marque est trop éloignée → le preneur arrive à vitesse max avant le donneur → risque de sortie de zone ou de ralentissement pour attendre", "Procédure de correction : réaliser 3-5 passages d'entraînement chronométrés et observer si la transmission se fait en début, milieu ou fin de zone", "Transmission en début de zone : marque trop loin → reculer de 1-2m", "Transmission en fin de zone : marque trop courte → avancer de 1-2m", "Méthode pratique : commencer avec une marque standard (ex : 7m pour le preneur avant la zone), ajuster par essai-erreur"]},
+{id:"a39",mod:"ath",disc:"Courses de relais",volet:"Technique",niv:"Analyser",pts:3,q:"Comparez les contraintes techniques du 4×100m et du 4×400m sur la gestion de la zone de transmission. Quelles adaptations pédagogiques en découlent ?",rep:["4×100m : deux coureurs à haute vitesse → passage en aveugle obligatoire ; marque fixe ; zone utilisée entièrement grâce à l'élan", "4×400m : coureurs fatigués et à vitesse variable → passage en vue préféré ; évaluation de la vitesse d'approche en temps réel", "4×400m : le donneur peut être très lent (crampes, épuisement) → le preneur DOIT adapter sa marque de départ dynamiquement", "Adaptation pédagogique 1 : enseigner d'abord le passage en vue (plus facile, plus sûr) avant d'introduire le passage en aveugle", "Adaptation pédagogique 2 : pratiquer des passages dans des conditions de fatigue simulée (après une course de 300m) pour préparer le 4×400m"]},
+{id:"a40",mod:"ath",disc:"Courses de relais",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez une séance de 40 min pour travailler la technique de transmission en 4×100m avec des débutants. Structurez en 4 situations progressives.",rep:["Situation 1 (8 min) — Transmission statique : par paires, marche lente, donneur place le témoin dans la main tendue du preneur → sensation tactile du bon passage", "Situation 2 (10 min) — Transmission trottée sur 30m : même exercice en trottinant, signal vocal 'hop' pour déclencher le bras du preneur → coordination des appuis", "Situation 3 (12 min) — Passage à allure modérée avec marque au sol : le preneur part sur la marque quand le donneur la franchit → ajustement de la marque sur 4-6 passages", "Situation 4 (10 min) — Passage complet en zone réelle à 80% de vitesse : passage en aveugle, le preneur ne regarde pas → critère de réussite : témoin transmis sans que le preneur ne ralentisse ou sorte de zone"]},
+{id:"a41",mod:"ath",disc:"Saut en longueur",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les caractéristiques réglementaires du sautoir en longueur : piste d'élan, planche d'appel, zone de réception.",rep:["Piste d'élan : longueur min 40m (idéalement 45m), largeur 1,22m ± 0,01m", "Planche d'appel : 1,22m × 0,20m, blanche, ras du sol, bord avant = ligne d'appel, zone d'argile (plasticine) côté fosse", "Zone de réception : largeur 2,75m min – 3m max, sable humide de niveau avec la planche", "Distance ligne d'appel → bord le plus éloigné de la zone de réception : ≥ 10m (recommandé 11m)", "Source : World Athletics Art. 185 / Hubiche & Pradet"]},
+{id:"a42",mod:"ath",disc:"Saut en longueur",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Lors d'un essai, la chaussure d'un athlète touche légèrement la plasticine sans franchir la ligne d'appel. L'essai est-il valable ? Expliquez en citant la règle.",rep:["L'essai est NUL : même un simple contact de la chaussure (ou de n'importe quelle partie du corps) sur la plasticine ou au-delà de la ligne d'appel = faute", "La plasticine est précisément là pour révéler ce contact invisible à l'œil nu", "Règle : 'en vertu de la Règle, une partie de sa chaussure ou de son pied touche le sol en dehors des extrémités de la planche d'appel, avant la ligne d'appel' → nul", "En revanche : si l'athlète prend son appel AVANT la planche (à 5cm devant) sans toucher la plasticine → l'essai est VALABLE mais non optimisé", "Source : World Athletics Règle 30.1.2 / ancienne Règle 185.1b"]},
+{id:"a43",mod:"ath",disc:"Saut en longueur",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Expliquez pourquoi la vitesse horizontale à l'appel est le déterminant majeur de la performance en saut en longueur. Donnez la formule simplifiée.",rep:["La distance de saut ≈ V² × sin(2θ) / g (formule du projectile)", "θ = angle de décollage (optimal théorique 45°, pratique ~18-22° car le CG est déjà en mouvement horizontal)", "V = vitesse de décollage : augmentation de 10% de V → augmentation de ~21% de la distance", "Conséquence : pour un débutant, travailler la vitesse de sprint améliore davantage la performance que travailler la technique de vol", "Record du monde : Mike Powell 8,95m (1991) avec une vitesse d'approche de ~10,8 m/s"]},
+{id:"a44",mod:"ath",disc:"Saut en longueur",volet:"Scientifique",niv:"Analyser",pts:3,q:"D'après Hubiche & Pradet, comment hiérarchiser les déterminants de performance en saut en longueur selon le niveau du sauteur ? Quelles implications pédagogiques ?",rep:["Niveau débutant (<4m) : la vitesse de course explique ~90% de la performance → travailler d'abord les sprints, l'accélération et la puissance d'impulsion", "Niveau intermédiaire (4-5,5m) : la qualité de l'appel (arriver à vitesse max avec le bon pied sur la planche) devient déterminant → travail de la régularité de l'élan et de la prise d'appel", "Niveau avancé (>5,5m) : les 4 facteurs s'équilibrent (vitesse, appel, vol, réception) → optimisation du style de vol et de la réception", "Implication 1 : ne pas perdre du temps sur le style de vol chez le débutant", "Implication 2 : travailler la régularité de l'élan (marqueur au sol) avant de travailler la planche", "Implication 3 : introduire le style en marche seulement quand vitesse d'élan et appel sont maîtrisés"]},
+{id:"a45",mod:"ath",disc:"Saut en longueur",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 4 phases du saut en longueur et l'objectif mécanique de chacune.",rep:["Phase 1 – Course d'élan : accélération progressive (20-40m), maximiser la vitesse horizontale, régularité des appuis vers la planche", "Phase 2 – Appel (impulsion) : pied d'appel sur la planche, extension explosive genou-hanche-cheville, lancer jambe libre et bras vers le haut", "Phase 3 – Vol : maintien de l'équilibre en l'air (style groupé, tendu ou en marche), préparer la réception en avançant les jambes", "Phase 4 – Réception : pieds joints en avant du CG, amortissement contrôlé, éviter le retour en arrière (bras vers l'avant)"]},
+{id:"a46",mod:"ath",disc:"Saut en longueur",volet:"Technique",niv:"Appliquer",pts:2,q:"Un élève retombe systématiquement en arrière lors de la réception. Analysez les causes biomécaniques et proposez 2 corrections.",rep:["Cause 1 : centre de masse projeté en arrière à l'atterrissage → les pieds avancent mais le corps suit mal → Correction : réception depuis une hauteur (caisse 40cm), accent sur la projection des bras et du buste vers l'avant au moment du contact", "Cause 2 : jambes insuffisamment tendues vers l'avant (flexion hâtive des genoux en vol) → Correction : travail du style groupé exagéré en vol sur mini-trampoline → habituer les jambes à rester hautes longtemps", "Critère de réussite : les deux talons doivent toucher le sable AVANT que le reste du corps ne s'effondre vers l'avant"]},
+{id:"a47",mod:"ath",disc:"Saut en longueur",volet:"Technique",niv:"Analyser",pts:3,q:"Analysez les 3 styles de vol en saut en longueur (groupé, tendu, en marche). Quel style recommandez-vous en enseignement scolaire et à quel niveau ?",rep:["Style groupé : genoux contre poitrine en vol → simple à apprendre, adapté débutants, mais mauvaise position pour la réception (déséquilibre)", "Style tendu (Dyatchkov) : corps allongé type ATR → esthétique mais peu d'avantage mécanique prouvé, difficile à maîtriser", "Style en marche (walking in the air) : 2-3 pas aériens → biomécanique optimale car maintient l'équilibre du CG et prépare une réception avec jambes hautes", "Recommandation scolaire niveau 1 (débutant) : style groupé pour la sécurité et la facilité d'exécution", "Recommandation niveau 2 (intermédiaire) : introduire le style en marche dès que l'élan atteint 6-7m et que l'appel est maîtrisé"]},
+{id:"a48",mod:"ath",disc:"Saut en longueur",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez une progression sur 3 étapes pour enseigner la gestion de la prise d'appel (élan et régularité) à des débutants.",rep:["Étape 1 (5 pas) : élan de 5 pas depuis un marqueur fixe → trouver le pied d'appel naturel et vérifier la régularité de l'arrivée sur la planche (marqueur pied au sol)", "Étape 2 (10-15 pas) : allonger progressivement l'élan avec marqueur de départ fixe → observer si le pied d'appel reste régulier sur la planche", "Étape 3 (20-25 pas élan complet) : ajuster la marque de départ selon les observations → vérifier avec plaque de plasticine ou vidéo que l'appel est précis et régulier", "Critère de réussite : 8 essais sur 10 avec appui à moins de 5cm de la planche sans la franchir"]},
+{id:"a49",mod:"ath",disc:"Saut en hauteur",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les règles de concours en saut en hauteur ? Précisez les essais, la progression de la barre et les conditions de nullité d'un essai.",rep:["3 essais maximum par hauteur ; 3 nuls consécutifs (quelle que soit la hauteur) = élimination", "Progression de barre : au minimum 2 cm par hausse en compétition officielle", "Nullité : la barre tombe du support après le passage (même sur la zone de réception), franchissement sous la barre, retrait de la barre par l'athlète avant passage", "L'athlète peut choisir de 'passer' une hauteur mais ne récupère pas ses essais", "En cas d'égalité : départage par le moins de nuls à la hauteur franchie, puis le moins de nuls total, puis barre d'or (saut supplémentaire)"]},
+{id:"a50",mod:"ath",disc:"Saut en hauteur",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"À 1,85m, une athlète renverse la barre lors de la réception en retombant sur le tapis. L'essai est-il nul ? Y aurait-il une différence si la barre tombe 3 secondes après qu'elle ait quitté la zone ?",rep:["Essai NUL : la barre est tombée du support après le franchissement → peu importe le moment exact de la chute (pendant ou après la réception)", "La règle est claire : le franchissement n'est validé QUE SI la barre reste sur les taquets après que l'athlète a quitté la zone de réception", "Si la barre tombe 3 secondes après que l'athlète ait correctement quitté la zone → attendre : si elle tombait à cause du vent ou d'un autre facteur externe, le juge-arbitre peut valider", "En pratique : le juge-arbitre observe la barre pendant quelques secondes après le départ de l'athlète de la zone avant de lever le drapeau blanc"]},
+{id:"a51",mod:"ath",disc:"Saut en hauteur",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Expliquez le paradoxe biomécanique du Fosbury Flop : comment le sauteur peut-il franchir une barre dont la hauteur dépasse son centre de masse ?",rep:["Le CG du corps ne franchit pas forcément la barre : en se cambrant dorsalement, le CG peut passer EN DESSOUS de la barre", "En franchissant segment par segment (jambes d'abord → bassin → épaules), chaque partie passe la barre séquentiellement", "Le CG suit une trajectoire inférieure à la barre car le corps forme une arche au-dessus d'elle", "Exemple : un sauteur de 1,85m peut franchir 2,20m car son CG ne monte qu'à ~1,95-2,05m (économie de 15-20cm)", "Cela est impossible avec le rouleau ventral (face vers le bas) car le CG doit passer au-dessus de la barre"]},
+{id:"a52",mod:"ath",disc:"Saut en hauteur",volet:"Scientifique",niv:"Analyser",pts:3,q:"Analysez l'évolution historique des techniques de saut en hauteur (ciseau, rouleau ventral, Fosbury Flop) d'un point de vue biomécanique. Pourquoi le Flop s'est-il imposé ?",rep:["Ciseau (XIXe-début XXe) : franchissement en position assise, CG bien au-dessus de la barre → très inefficace", "Rouleau ventral (Horine, 1912) : corps face vers le bas, CG au niveau de la barre ou légèrement dessus → meilleure efficacité que le ciseau", "Fosbury Flop (JO Mexico 1968) : dos à la barre, CG pouvant passer SOUS la barre → révolution mécanique", "Avantage quantifié : à effort égal (même vitesse d'appel), le Flop permet de franchir 15-25 cm de plus qu'en rouleau ventral", "Condition de diffusion : les tapis de mousse modernes ont permis l'atterrissage sur le dos sans risque de blessure", "Conclusion : le Flop est mécaniquement supérieur car il minimise la hauteur que le CG doit atteindre pour franchir la barre"]},
+{id:"a53",mod:"ath",disc:"Saut en hauteur",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les phases du Fosbury Flop : élan courbe, appel, vol dorsal, réception.",rep:["Élan courbe (7-9 pas) : 3-4 pas en ligne droite + 4-5 pas en arc (rayon 5-6m), accélération jusqu'à l'appel, inclinaison centrifuge du corps vers l'intérieur", "Appel : pied interne plié puis extension explosive, lancer bras et jambe libre vers le haut, rotation du bassin pour présenter le dos à la barre", "Vol dorsal : cambure maximale du corps (arche), franchissement segment par segment jambes-bassin-épaules, regard vers le haut", "Réception : atterrissage nuque/épaules/haut du dos sur le tapis, jambes se relèvent naturellement après le franchissement"]},
+{id:"a54",mod:"ath",disc:"Saut en hauteur",volet:"Technique",niv:"Appliquer",pts:2,q:"Un sauteur débutant tourne le dos à la barre mais ses hanches heurtent systématiquement la barre. Identifiez la cause et proposez 2 exercices correctifs.",rep:["Cause principale : cambure dorsale insuffisante pendant le vol → les hanches restent hautes au lieu de s'effacer", "Cause secondaire : l'appel n'est pas assez puissant → le corps monte trop peu haut → les hanches passent près de la barre sans marge", "Correction 1 : pont dorsal au sol (gainage lombaire + ouverture des épaules) puis pont sur ballon de gym → développer la souplesse d'extension dorsale", "Correction 2 : saut sur tapis bas (70-80 cm) sans barre, en exagérant la cambure → prise de conscience proprioceptive de la position 'hanches hautes, dos cambré'", "Critère de réussite : à la hauteur travaillée, les hanches doivent être au moins 10 cm plus hautes que le niveau de la barre au moment du passage"]},
+{id:"a55",mod:"ath",disc:"Triple saut",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Décrivez la succession des 3 phases du triple saut (hop-step-jump) avec le pied de réception de chacune. Quelle est la distance minimale réglementaire de la planche d'appel ?",rep:["Hop : appel pied droit → réception pied DROIT (même pied)", "Step : appel pied droit → réception pied GAUCHE (pied opposé)", "Jump : appel pied gauche → réception DEUX PIEDS dans le sable", "Distance planche d'appel → bord le plus proche de la zone de réception : ≥ 13m hommes / ≥ 11m femmes (compétitions internationales)", "Ce n'est pas une faute si la jambe 'morte' touche le sol accidentellement pendant les phases"]},
+{id:"a56",mod:"ath",disc:"Triple saut",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Un tripleur prend appel à 15m de la planche (hors planche). Son pied gauche touche le sol entre le hop et le step. L'essai est-il valable ? Justifiez.",rep:["Essai VALABLE (sous réserve des autres conditions) car :", "1. Prendre appel avant la planche (à 15m = avant le bord avant) est autorisé → pas de faute", "2. Le contact de la jambe 'morte' (jambe non-d'appel) avec le sol entre les phases n'est PAS une faute selon le règlement World Athletics Art. 186.3", "En revanche l'essai serait NUL si : la planche était franchie (contact sur la plasticine), ou si la jambe d'appel du hop touchait le sol entre hop et step", "La mesure se fait depuis la marque dans le sable jusqu'à la ligne d'appel de la planche (ou jusqu'au point de décollage si en avant de la planche)"]},
+{id:"a57",mod:"ath",disc:"Triple saut",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Quelles ressources physiques spécifiques distinguent le triple saut du saut en longueur ? Expliquez les exigences de la réception unipodale.",rep:["Exigence principale supplémentaire : force plyométrique en réception unipodale (absorber et restituer l'énergie sur un seul pied à haute vitesse)", "Lors du hop : le sauteur reçoit l'impact sur un seul pied avec une force équivalente à 3-5 fois son poids corporel → muscles extenseurs en charge excentrique extrême", "Ressources spécifiques : (1) force-vitesse des extenseurs du membre inférieur, (2) souplesse cheville/genou pour amortir sans blessure, (3) équilibre dynamique unipodal", "Différence avec le saut en longueur : en longueur, les deux pieds atterrissent en finale ; en triple saut, chaque phase demande un atterrissage unipodal amorti"]},
+{id:"a58",mod:"ath",disc:"Triple saut",volet:"Scientifique",niv:"Analyser",pts:3,q:"Analysez les interactions biomécaniques entre les 3 phases du triple saut. Pourquoi un hop trop long compromet-il l'ensemble de la performance ?",rep:["Chaque phase utilise l'énergie cinétique (vitesse horizontale) de la phase précédente", "Un hop trop long impose une réception à angle d'atterrissage trop vertical → perte importante d'énergie cinétique (freinage) au contact du sol", "Conséquence en cascade : si hop trop long → step mécaniquement court (manque d'élan entrant) → jump également limité", "Répartition optimale élite : hop ~37% / step ~30% / jump ~33% de la distance totale", "Règle d'or : maintenir la vitesse horizontale sur chaque appui → angle d'appui ~60-65° par rapport au sol", "Implication pédagogique : enseigner à 'rebondir loin' (vitesse horizontale) plutôt qu'à 'sauter haut' à chaque phase"]},
+{id:"a59",mod:"ath",disc:"Triple saut",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les 3 erreurs techniques les plus fréquentes en triple saut chez les débutants ? Précisez la cause de chacune.",rep:["Erreur 1 – Hop trop long : recherche instinctive du saut maximal dès la 1ère phase → compromet l'ensemble de la suite", "Erreur 2 – Step trop court : la réception unipodale après le hop est difficile → l'athlète cherche à finir rapidement dans le sable", "Erreur 3 – Manque de rythme global : les 3 phases ont des durées très inégales → signe d'un rapport force/vitesse insuffisant en réception", "Cause commune : insuffisance de la force explosive en réception unipodale (manque d'entraînement spécifique)"]},
+{id:"a60",mod:"ath",disc:"Triple saut",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez une progression de 3 situations d'apprentissage pour enseigner le rythme du triple saut à des élèves débutants.",rep:["Situation 1 — Triples bonds rythmés : sur gazon ou surface molle, sans vitesse, séquence 'pied-pied-deux pieds' en marchant puis en trottinant → familiarisation avec la succession des appuis", "Situation 2 — Triple saut depuis 3-5 pas d'élan avec cibles au sol : des cerceaux ou des marqueurs positionnés pour chaque réception → guidance spatiale des 3 phases", "Situation 3 — Triple saut complet depuis planche à 7m avec comptage vocal 'un-deux-saut' : intégration du rythme dans la vitesse d'élan, correction de l'enseignant sur l'équilibre des phases", "Critère de réussite : les 3 phases sont à peu près équilibrées (rapport 35%/30%/35%) et le sauteur ne s'arrête pas entre les phases"]},
+// ── SPORTS COLLECTIFS ──
+{id:"s1",mod:"sc",disc:"Handball",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les dimensions réglementaires d'un terrain de handball ? Citez la zone de but et la ligne de jet franc.",rep:["40m × 20m","Zone de but : demi-cercle rayon 6m","Ligne de jet franc (pointillés) : 9m","Ligne de penalty (jet de 7m) : à 7m des buts"]},
+{id:"s2",mod:"sc",disc:"Handball",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les phases de la contre-attaque en handball en précisant le rôle de chaque acteur.",rep:["Phase 1 : récupération du ballon et passe immédiate au demi-centre","Phase 2 : demi-centre lance la contre-attaque par longue passe vers l'espace libre","Phase 3 : finition en surnombre avant la réorganisation défensive adverse"]},
+{id:"s3",mod:"sc",disc:"Handball",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"En handball, dans quelles situations un jet de 7m (penalty) est-il accordé ? Citez 3 cas.",rep:["Faute sur un joueur en position de tir clair face au gardien","Faute à l'intérieur de la zone de but sur un joueur en possession","Comportement antisportif grave empêchant un but certain"]},
+{id:"s4",mod:"sc",disc:"Basketball",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelle est la différence entre une faute et une violation en basketball ? Donnez un exemple de chaque.",rep:["Faute : contact illégal entre joueurs (ex : pushing) → tirs francs ou remise en jeu","Violation : infraction sans contact (ex : marcher, 3 secondes) → remise en jeu adverse"]},
+{id:"s5",mod:"sc",disc:"Basketball",volet:"Technique",niv:"Appliquer",pts:2,q:"Décrivez un système offensif 3-2 en basketball et une combinaison tactique utilisant un écran.",rep:["3-2 : 3 joueurs en ligne haute (2 ailiers + meneur) + 2 pivots/intérieurs","Écran : meneur utilise l'écran posé par le pivot pour se démarquer et prendre un tir","L'écran doit être légal (joueur fixe, pieds au sol, pas de contact)"]},
+{id:"s6",mod:"sc",disc:"Football",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Comparez en 4 points la défense homme à homme et la défense en zone en football.",rep:["Homme/homme : chaque défenseur suit un attaquant précis → pression individuelle forte","Zone : chaque défenseur protège une zone du terrain → organisation collective","Avantage H/H : harcèlement individuel efficace, utile en fin de match","Avantage zone : économise les efforts, garde la structure, sûre contre les rotations"]},
+{id:"s7",mod:"sc",disc:"Entraînement",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez 2 exercices pour développer l'explosivité adaptée au basketball. Décrivez : dispositif, dosage, qualité ciblée.",rep:["Squat-jump (3×8) — quadriceps, fessiers — explosivité concentrique pour le rebond","Navettes 5-10-15m (5 séries, récup 1min30) — accélération, décélération, changement de direction"]},
+// ── VOLLEYBALL ──
+{id:"v1",mod:"vb",disc:"Règlement",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Expliquez le système de marque actuel en volleyball (rally point). Comment gagne-t-on un set et un match ?",rep:["Rally point : chaque échange donne un point au gagnant qu'on serve ou non","Gain d'un set : 25 points avec 2 points d'écart (15 points au set décisif)","Gain du match : 3 sets gagnants sur 5 (2 sur 3 en compétition scolaire)"]},
+{id:"v2",mod:"vb",disc:"Règlement",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Quel est le rôle du libero ? Citez 2 restrictions réglementaires spécifiques.",rep:["Rôle : spécialiste défensif et réceptionneur, joue uniquement en position arrière","Maillot différent obligatoire pour être identifiable par les arbitres","Restriction 1 : ne peut pas attaquer au-dessus du bord supérieur du filet","Restriction 2 : ne peut pas servir ni bloquer"]},
+{id:"v3",mod:"vb",disc:"Technique",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez la technique d'exécution de la manchette : position du corps, des bras, point de contact.",rep:["Corps : jambes fléchies, poids sur avant-pieds, buste penché en avant","Bras : coudes tendus, mains liées (prise en coupe ou croisée), avant-bras en plateforme plane","Point de contact : partie inférieure des avant-bras, ~10 cm au-dessus du poignet"]},
+{id:"v4",mod:"vb",disc:"Tactique",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez le système de réception en W (5 joueurs). Responsabilités de chaque poste.",rep:["5 joueurs forment un W devant le filet, passeur non réceptionnaire","Zone 1 (arrière droit) : balles courtes côté droit","Zone 5 (arrière gauche) : balles courtes côté gauche","Zone 6 (arrière centre) : balles longues"]},
+{id:"v5",mod:"vb",disc:"Entraînement",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Analysez les avantages et limites du système offensif 5-1 en VB scolaire.",rep:["5-1 : 1 seul passeur + 5 attaquants — passeur toujours en jeu","Avantage : cohérence du jeu, expertise du passeur","Limite : si passeur absent ou faible, tout le système s'effondre","Adaptation scolaire : rotation du rôle de passeur chaque séance"]},
+// ── GAS ──
+{id:"g1",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Que signifie la 'Difficulté' (D) en GAS et quel est le principe de compensation des familles ?",rep:["Difficulté (D) = somme des valeurs des éléments gymniques les plus difficiles réalisés", "Note finale GAS = Difficulté (D) + Exécution (E) + Composition (familles gymniques)", "Compensation 1 : une difficulté manquante peut être partiellement remplacée par une difficulté inférieure (valant alors 0,25 pt)", "Compensation 2 : une difficulté supérieure peut remplacer une difficulté inférieure"]},
+{id:"g2",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Comment se compose la note finale en GAS selon le Code de Pointage OP 2009 ? Citez les trois composantes.",rep:["Note de Difficulté (D) : valeur des éléments gymniques réalisés (additive)", "Note d'Exécution (E) : sur 10 points avec déductions pour fautes", "Note de Composition : présence d'au minimum 4 familles gymniques exigées", "Note finale = D + E + Composition"]},
+{id:"g3",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les principales fautes entraînant une déduction sur la note d'Exécution (E) en GAS ? Citez 3 exemples avec leur pénalité.",rep:["Chute sur les mains ou les genoux : −1,00 pt sur E", "Grande faute d'exécution (jambes fléchies, pieds écartés) : −0,30 pt", "Faute moyenne (manque d'amplitude, léger déséquilibre) : −0,10 pt"]},
+{id:"g4",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Un gymnaste réalise un enchaînement : D = 4,0 pts, Composition = 1,6 pts. Il commet une chute (−1,0), deux fautes moyennes (−0,1 chacune) et une sortie (−0,1). E départ = 10,0. Calculez la note finale.",rep:["Total déductions E = 1,0 + 0,1 + 0,1 + 0,1 = 1,3 pts", "Note E = 10,0 − 1,3 = 8,7", "Note finale = D + Composition + E = 4,0 + 1,6 + 8,7 = 14,3 points"]},
+{id:"g5",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Appliquer",pts:2,q:"Deux gymnastes sont à égalité de note finale (13,5). Gymnaste A : D=5,5 / E=8,0. Gymnaste B : D=4,5 / E=9,0. Lequel est classé premier selon le règlement OP 2009 ? Justifiez.",rep:["En cas d'égalité de note finale, le règlement retient la meilleure note E", "Gymnaste B (E=9,0) est classé PREMIER devant Gymnaste A (E=8,0)", "Principe docimologique : l'exécution prime sur la difficulté en cas d'égalité\nRéférence : Code de Pointage OP 2009 — Procédure de départage"]},
+{id:"g6",mod:"gas",disc:"Scientifique GAS",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les principales articulations sollicitées lors de l'exécution d'un Appui Tendu Renversé (ATR) ? Précisez le type de contrainte pour chacune.",rep:["Épaules : flexion maximale + abduction → mise en tension de la coiffe des rotateurs", "Poignets : extension forcée → support de la totalité du poids corporel", "Colonne cervicale : légère extension → vigilance posturale (gainage cervical)", "Colonne lombaire : risque d'hyperlordose si gainage abdominal insuffisant\nRéférence : Anatomie fonctionnelle — Kapandji / Analyse biomécanique GAS"]},
+{id:"g7",mod:"gas",disc:"Scientifique GAS",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Définissez le concept de 'gainage musculaire' et expliquez son rôle spécifique dans la pratique de la Gymnastique Artistique.",rep:["Gainage = contraction isométrique simultanée des muscles du tronc (abdominaux, obliques, érecteurs du rachis)", "Action de rétroversion pelvienne : bascule du bassin vers l'arrière pour verrouiller la colonne lombaire", "Rôle 1 : maintenir l'axe corporel rigide pendant les éléments (ATR, salto)", "Rôle 2 : transmettre les forces d'impulsion sans perte d'énergie", "Rôle 3 : prévenir les blessures lombaires lors des réceptions"]},
+{id:"g8",mod:"gas",disc:"Scientifique GAS",volet:"Scientifique",niv:"Connaître / Comprendre",pts:1,q:"Analysez le rôle biomécanique du moment d'inertie dans les éléments gymniques comportant une rotation (salto, vrille). Comment le gymnaste le modifie-t-il ?",rep:["Moment d'inertie (I) = résistance d'un corps à la rotation autour d'un axe", "I augmente quand les membres sont éloignés de l'axe de rotation (position carpée/tendue)", "I diminue quand les membres sont regroupés près du centre (position groupée)", "Gymnaste : se regroupe pour accélérer la rotation → s'étend pour la ralentir avant réception", "Loi de conservation du moment cinétique : L = I × ω = constante\nRéférence : Mécanique du corps humain — Biomécanique des rotations en GAS"]},
+{id:"g9",mod:"gas",disc:"Scientifique GAS",volet:"Scientifique",niv:"Appliquer",pts:2,q:"Un élève de 4ème réalise un salto avant avec une rotation insuffisante. À partir des principes biomécaniques, identifiez les causes possibles et proposez deux corrections ciblées.",rep:["Cause 1 : impulsion insuffisante (genou pas assez fléchi avant extension) → correction : exercice de saut en hauteur avec marqueur à dépasser", "Cause 2 : bras n'accompagnent pas le mouvement de rotation (pas de lancer) → correction : exercice avec lancer des bras vers le haut au moment de l'impulsion", "Cause 3 : position trop carpée/ouverte → correction : travail du regroupement en trampoline ou en fosse", "Principe : augmenter I lors de l'impulsion, diminuer I pendant la rotation\nRéférence : Pédagogie de la GAS — Méthode analytique d'observation/correction"]},
+{id:"g10",mod:"gas",disc:"Scientifique GAS",volet:"Scientifique",niv:"Appliquer",pts:2,q:"Lors de la réception d'un saut de main, un élève tombe en arrière systématiquement. Analysez uniquement les causes biomécaniques.",rep:["Centre de masse (CM) projeté en arrière de la base de sustentation à la réception", "Manque d'amplitude de la poussée des bras (impulsion incomplète au sol)", "Regard dirigé vers le bas → déséquilibre antéropostérieur", "Jambes trop raides à l'impact → absence d'amortissement par triple flexion"]},
+{id:"g11",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Listez les 5 familles d'éléments gymniques au sol en GAS et donnez un exemple pour chacune.",rep:["Roulement : roulade avant, roulade arrière", "Renversement : roue, rondade, ATR", "Rotation : salto avant, salto arrière", "Attitude (équilibre) : ATR maintenu, planche, arabesque", "Mouvement de souplesse : pont, grand écart, souplesse avant"]},
+{id:"g12",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 3 phases techniques de la roulade avant groupée.",rep:["Phase 1 — Mise en action : flexion jambes, mains au sol largeur d'épaules, menton sur la poitrine", "Phase 2 — Roulement : contact nuque puis dos arrondi, transfert du poids vers les fesses en position groupée", "Phase 3 — Redressement : élan des bras vers l'avant, extension pour finir debout"]},
+{id:"g13",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 3 phases techniques de la roulade arrière groupée et le critère de sécurité cervical.",rep:["Phase 1 — Mise en action : accroupi, dos arrondi, mains posées près des oreilles (paumes vers le ciel)", "Phase 2 — Roulement : bascule arrière groupée, appui actif des mains pour décharger les cervicales", "Phase 3 — Redressement : poussée des bras et extension pour finir accroupi ou debout", "Sécurité : l'appui des mains est indispensable pour protéger les cervicales"]},
+{id:"g14",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les 3 phases techniques de la roue en précisant les appuis successifs.",rep:["Phase 1 — Pose des mains : main puis main alignées dans l'axe du déplacement, corps qui bascule", "Phase 2 — Passage à l'ATR latéral : corps aligné jambes écartées, passage par la verticale renversée", "Phase 3 — Réception : pied puis pied posés successivement, retour à la position debout de face"]},
+{id:"g15",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Qu'est-ce qu'un 'élément de liaison' en GAS ? Quel est son rôle dans la notation ? Donnez deux exemples.",rep:["Élément de liaison : élément gymnasique qui assure la transition entre deux éléments acrobatiques de familles différentes", "Rôle dans la notation : valorise l'enchaînement fluide (bonus de liaison dans certains codes), maintient la dynamique du parcours sans rupture de rythme", "Exemple 1 : fente avant entre une roulade et une roue", "Exemple 2 : tour sur une jambe (pirouette de danse) entre deux acrobaties\nRéférence : OP 2009 — Bonification de liaison / Continuité du parcours gymnique"]},
+{id:"g16",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Définissez le 'parcours gymnique' en GAS scolaire. Quels sont les critères minimaux de validité, dont le critère de sécurité ?",rep:["Parcours gymnique : enchaînement d'éléments reliés de manière continue sur le praticable", "Critère 1 : nombre minimal d'éléments imposé (ex. 5 éléments)", "Critère 2 : représentation d'au moins 2 familles d'éléments différentes", "Critère 3 : utilisation de l'espace (déplacements dans au moins 2 directions)", "Critère de sécurité : éléments adaptés au niveau de l'élève, réception maîtrisée, pas d'élément non préparé"]},
+{id:"g17",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez la technique de l'ATR (Appui Tendu Renversé) en précisant : position des bras, du corps, de la tête et des jambes.",rep:["Bras : tendus, verticaux, mains à largeur d'épaules, doigts écartés pointant en avant", "Corps : aligné de la tête aux talons (gainage total), hanches dans l'axe des épaules", "Tête : légèrement en extension, regard entre les mains (pas vers le bas)", "Jambes : serrées, tendues, pointes de pieds étirées vers le haut", "Équilibre : corrections par les doigts (appui) et les épaules (bascule légère)\nRéférence : Technique gymnique — Famille des éléments d'équilibre renversé"]},
+{id:"g18",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Qu'est-ce que la 'rondade' en GAS ? Comment se distingue-t-elle de la roue et quel élément permet-elle d'enchaîner ?",rep:["Rondade : élément acrobatique dérivé de la roue, avec une rotation de 180° pour finir en position dos à la direction d'élan (pieds joints)", "Différence avec la roue : la rondade se termine PIEDS JOINTS et FACE AU SOL (direction inverse), alors que la roue se termine de profil", "Enchaînement permis : la rondade permet d'enchaîner un flip arrière (flip arrière) ou un salto arrière car le gymnaste repart vers l'arrière", "Phase spécifique : la rotation du bassin dans le plan frontal pendant l'appui\nRéférence : Classification des éléments acrobatiques — GAS sol"]},
+{id:"g19",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Citez et définissez les 3 positions corporelles codifiées en gymnique acrobatique pour les éléments en rotation (salto).",rep:["Position GROUPÉE : genoux et hanches fléchis à 90°, corps ramassé sur lui-même — moment d'inertie minimal = rotation maximale", "Position CARPÉE : hanches fléchies à 90°, jambes tendues, corps plié à la hanche — inertie intermédiaire", "Position TENDUE/VRILLÉE : corps entièrement allongé, bras le long du corps — moment d'inertie maximal = rotation plus lente mais esthétique\nRéférence : Code de Pointage FIG — Nomenclature des positions de vol"]},
+{id:"g20",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Décrivez la technique d'exécution du saut de main en précisant les phases des bras et des jambes.",rep:["Départ : course d'élan, pose des deux mains au sol bras tendus, corps aligné", "Phase 1 — Appui : transfert du poids sur les mains, jambe d'attaque lancée vers le haut", "Phase 2 — Renversement : passage par l'ATR, poussée dynamique des épaules et des bras", "Phase 3 — Réception : ouverture du corps, arrivée sur les deux pieds, bras vers le haut"]},
+{id:"g21",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Construisez un parcours gymnique de 5 éléments appartenant à au moins 3 familles différentes selon OP 2009. Précisez l'ordre, la famille et la logique de progression.",rep:["Parcours proposé : (1) Fente avant [liaison/danse] → (2) Roulade avant groupée [acrobatique avant] → (3) ATR-pont [équilibre renversé] → (4) Roue [renversement latéral] → (5) Rondade [acrobatique arrière-préparatoire]", "Familles couvertes : Liaison/danse | Acrobatique avant | Équilibre renversé | Renversement latéral | Acrobatique arrière", "Logique de progression : du sol vers le renversé → du statique vers le dynamique → de l'avant vers l'arrière", "Valeur pédagogique : chaque élément prépare le suivant (roulade → ATR : même axe avant) (ATR-pont → roue : même renversement)\nRéférence : Pédagogie GAS — Construction de parcours / Progressivité des apprentissages"]},
+{id:"g22",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Un élève exécute une roue avec les jambes fléchies et les bras qui se plient. Identifiez les 2 erreurs et proposez un exercice correctif pour chacune.",rep:["Erreur 1 — Jambes fléchies : tonicité insuffisante (quadriceps, fessiers) en position renversée → Exercice : roue contre un mur pour forcer l'extension", "Erreur 2 — Bras qui se plient : force des extenseurs d'épaule insuffisante → Exercice : ATR contre mur 10 sec pour renforcer les épaules", "Critère de réussite : le corps passe par un plan vertical vu de face, sans cassure à la hanche"]},
+{id:"g23",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Proposez une progression pédagogique en 3 étapes pour l'apprentissage de la roue pour des collégiens débutants.",rep:["Étape 1 — Pré-requis : ATR contre mur + déplacement latéral mains-pieds → sentir l'alignement renversé", "Étape 2 — Initiation guidée : roue par-dessus un banc bas ou une ligne tracée → guider la trajectoire des appuis", "Étape 3 — Autonomisation : roue complète libre, jambes tendues et écartées → recherche de l'amplitude et de la verticalité", "Critères de validation : alignement vertical, jambes tendues, passage des 4 appuis dans l'axe"]},
+{id:"g24",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Un élève présente un ATR non tenu (bascule immédiate vers l'avant). Sans matériel spécifique, proposez 3 exercices de remédiation utilisables en classe.",rep:["Exercice 1 : ATR contre le mur (dos au mur) — travail de l'alignement et de la durée de tenue (5-10 sec)", "Exercice 2 : ATR avec partenaire (un tient les chevilles) — décharge la peur et permet de corriger le gainage sans risque", "Exercice 3 : Poirier sur avant-bras (chandelle) → transition progressive vers ATR complet — renforce le gainage en position renversée", "Critère de réussite : tenir l'ATR 3 secondes minimum avec corps aligné, sans aide\nRéférence : Pédagogie GAS — Remédiation ATR sans matériel spécifique"]},
+{id:"g25",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Comment évalueriez-vous le niveau technique de la roulade avant chez vos élèves ? Proposez 4 critères d'observation précis et observables.",rep:["Critère 1 — Sécurité : appui de la nuque (jamais de la tête) avec menton sur la poitrine : OUI / NON", "Critère 2 — Alignement : dos arrondi en contact continu avec le sol (pas de coup de reins) : OUI / NON", "Critère 3 — Dynamique : utilisation de l'élan pour finir debout sans aide des mains au sol : OUI / NON", "Critère 4 — Groupé : genoux joints et serrés contre la poitrine pendant toute la phase de roulade : OUI / NON", "Notation : 4 critères observés = très bien / 3 = bien / 2 = assez bien / 1-0 = insuffisant\nRéférence : Grille d'évaluation GAS scolaire — Critères d'observation objectifs"]},
+{id:"g26",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Décrivez comment enseigner la rondade à des élèves ayant déjà maîtrisé la roue. Quels sont les points techniques à ajouter et comment les introduire ?",rep:["Point technique 1 : quart de tour du bassin pendant la phase d'appui (2 mains au sol) → exercice : roue avec pied d'arrivée orienté 45° puis 90° progressivement", "Point technique 2 : fermeture des pieds au moment du retour au sol → exercice avec cerceaux pour guider l'atterrissage pieds joints", "Point technique 3 : impulsion finale vers le haut et l'arrière (pour enchaîner flip) → exercice avec mini-trampoline ou zone rebond en fin de rondade", "Vérification : le gymnaste doit finir DOS au sens de son élan, pieds joints, bras vers l'avant-haut\nRéférence : Progression roue → rondade — Technique gymnique avancée"]},
+{id:"g27",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les actions musculaires principales lors de la phase d'impulsion d'un saut vertical en GAS ? Citez les muscles et leur rôle.",rep:["Quadriceps : extension du genou → propulsion verticale", "Triceps sural (mollet) : extension de la cheville → poussée finale (gainage de la chaîne)", "Fessiers : extension de la hanche → puissance de l'impulsion", "Gainage abdominal : transmet la force des jambes vers le haut du corps sans perte"]},
+{id:"g28",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Citez les 3 erreurs les plus fréquentes lors de la roulade arrière chez les débutants et proposez une correction pour chacune.",rep:["Erreur 1 — Mains mal placées : pas d'appui pour décharger la nuque → Correction : poser les mains près des oreilles, paumes vers le ciel", "Erreur 2 — Dos non arrondi : roulement bloqué → Correction : rester groupé, menton sur la poitrine tout le long", "Erreur 3 — Manque d'élan : reste bloqué sur le dos → Correction : départ dynamique, pousser fort sur les mains au passage"]},
+{id:"g29",mod:"gas",disc:"Technique GAS",volet:"Technique",niv:"Appliquer",pts:2,q:"Quels sont les critères d'observation pour évaluer un ATR (Appui Tendu Renversé) chez un élève ? Citez-en 4.",rep:["Critère 1 — Alignement : corps droit de la tête aux pieds (pas de cassure à la hanche)", "Critère 2 — Gainage : tronc tonique, pas de creux lombaire", "Critère 3 — Tenue : maintien de l'équilibre 3 secondes minimum", "Critère 4 — Jambes : tendues et serrées, pointes de pieds étirées"]},
+{id:"g30",mod:"gas",disc:"Règlement GAS",volet:"Réglementaire",niv:"Connaître / Comprendre",pts:1,q:"Citez les familles gymniques qui doivent être représentées dans un enchaînement GAS et le nombre minimal exigé.",rep:["Familles : roulement, renversement, rotation, attitude (équilibre), mouvement de souplesse", "Minimum 4 familles différentes doivent être représentées dans l'enchaînement", "Chaque famille présente contribue à la note de Composition", "L'absence d'une famille exigée entraîne une pénalité de composition"]},
+{id:"g31",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Quelles sont les qualités physiques spécifiques prioritaires en Gymnastique Artistique ? Classez-les par ordre d'importance pédagogique.",rep:["1. Coordination (indispensable pour enchaîner et contrôler les éléments)", "2. Souplesse / mobilité articulaire (sécurité des gestes + esthétique)", "3. Force-gainage (support de tous les éléments portés et acrobatiques)", "4. Équilibre / proprioception (maintien en ATR, réceptions)", "5. Explosivité / détente verticale (sauts, impulsions)", "Note pédagogique : la coordination et la souplesse sont les plus difficiles à développer tardivement → priorité aux jeunes\nRéférence : Physiologie de l'entraînement GAS / Bompa — Développement des qualités physiques"]},
+{id:"g32",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Décrivez les étapes clés d'un échauffement général adapté à une séance de GAS (durée 8-10 min). Justifiez chaque phase.",rep:["Phase 1 — Activation cardiovasculaire (2 min) : trottinement léger, sauts sur place, skipping → augmente FC et température musculaire", "Phase 2 — Mobilisation articulaire segmentaire (3 min) : poignets, épaules, colonne, hanches, chevilles → préparation aux appuis et renversements", "Phase 3 — Étirements dynamiques (2 min) : balancements de jambes, rotations de tronc → amplitude progressive sans blocage", "Phase 4 — Activation spécifique (3 min) : ponts, montées en ATR contre mur, petits sauts → préparation neuromusculaire aux éléments de la séance\nRéférence : Physiologie de l'échauffement / Méthodologie de l'entraînement GAS"]},
+{id:"g33",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Quels sont les principes d'entraînement sportif généraux applicables à la GAS scolaire ? Citez 4 principes et leur traduction pratique.",rep:["Principe 1 — Progressivité : augmenter la difficulté des éléments graduellement (roulade → ATR → salto)", "Principe 2 — Spécificité : travailler les qualités physiques en rapport avec les gestes gymniques (souplesse en position de praticable)", "Principe 3 — Répétition/consolidation : répéter les éléments maîtrisés avant d'en introduire de nouveaux", "Principe 4 — Individualisation : adapter les parcours au niveau de chaque élève (objectifs différenciés)\nRéférence : Théorie de l'entraînement sportif — Principes généraux / Matveev 1965"]},
+{id:"g34",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Quels types d'exercices utilise-t-on pour développer la souplesse spécifique à la GAS ? Distinguez étirements statiques et dynamiques et précisez quand les utiliser.",rep:["Étirements statiques (passifs ou actifs) : maintien d'une position 15-30 sec → APRÈS la séance ou en séance dédiée hors compétition → développe l'amplitude articulaire", "Étirements dynamiques : balancements, rotations contrôlées → AVANT la séance (échauffement) → prépare les muscles sans réduire la force", "Exercices spécifiques GAS : pont (souplesse lombaire + épaules), grand écart (hanches), tour de poignet actif (prévention blessure)", "Règle de sécurité : ne jamais forcer les étirements statiques en phase d'échauffement\nRéférence : Physiologie de la souplesse / INSEP — Recommandations étirements en GAS"]},
+{id:"g35",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Connaître / Comprendre",pts:1,q:"Quels sont les principaux risques de blessure en GAS scolaire et quelles mesures préventives l'enseignant doit-il mettre en place ?",rep:["Blessure 1 — Entorses du poignet : prévention par renforcement des fléchisseurs + bandes/strapping lors des ATR répétés", "Blessure 2 — Traumatismes cervicaux (roulade arrière mal exécutée) : prévention par parade systématique et maîtrise des prérequis", "Blessure 3 — Chutes lors des réceptions : prévention par tapis de réception épais et apprentissage de la chute amortie", "Blessure 4 — Lésions lombaires (hyperextension) : prévention par gainage systématique et interdiction des éléments dépassant les capacités", "Mesure générale : échauffement obligatoire, matériel vérifié, parade enseignée, progressivité respectée\nRéférence : Sécurité en EPS — Responsabilité de l'enseignant en GAS / Circulaires MEN"]},
+{id:"g36",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez un circuit de développement de la force-gainage de 6 stations adapté à la GAS pour une classe de 5ème. Précisez : exercice, durée, objectif.",rep:["Station 1 : Planche abdominale (gainage ventral) — 20 sec — renforce les abdominaux transverses", "Station 2 : Pont dorsal jambes fléchies (gainage dorsal) — 20 sec — renforce les extenseurs du rachis et les fessiers", "Station 3 : ATR contre mur (10 sec tenu) — renforce les stabilisateurs d'épaule et le gainage en position renversée", "Station 4 : Chandelle (poirier sur avant-bras) — 20 sec — équilibre inversé et gainage dorsal", "Station 5 : Pompes écartées (largeur épaules) — 8 répétitions — force des extenseurs du coude et des pectoraux", "Station 6 : Squat sauté avec atterrissage contrôlé — 8 rép — explosivité + proprioception de réception"]},
+{id:"g37",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Rédigez un plan de séance complet de 45 minutes pour l'apprentissage de l'ATR avec une classe de 4ème. Structurez : objectif, échauffement, partie principale, retour au calme.",rep:["Objectif : tenir un ATR contre mur 5 secondes et initier l'ATR libre avec parade", "Échauffement (8 min) : trottinement + mobilisation poignets/épaules + 3× ATR décomposé en accroupi", "Partie principale (30 min) : Sit1 — ATR contre mur dos (10 sec × 3) | Sit2 — ATR avec partenaire (1 tient les chevilles) | Sit3 — ATR libre tentative avec parade enseignant | Sit4 — Intégration dans mini-parcours roulade → ATR", "Retour au calme (7 min) : étirements statiques épaules + poignets + colonne + bilan collectif oral", "Critère de validation séance : 80% des élèves tiennent ATR contre mur 5 sec\nRéférence : Planification de séance GAS / Didactique de l'EPS — Construction de la leçon"]},
+{id:"g38",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Comment différencier les objectifs d'apprentissage en GAS pour une classe hétérogène (3 niveaux : débutant, intermédiaire, avancé) ? Proposez un tableau de différenciation pour un module de 6 séances.",rep:["Débutant : roulade avant/arrière sécurisée → ATR contre mur → équilibre sur une jambe 5 sec → parcours de 3 éléments", "Intermédiaire : ATR libre tenu 3 sec → roue → parcours de 5 éléments (2 familles) → notation OP simplifiée", "Avancé : rondade → mini flip arrière avec aide → parcours de 6 éléments (3 familles) → auto-notation par grille", "Différenciation : mêmes situations de base, objectifs et critères de réussite différents par niveau", "Évaluation différenciée : grilles à 3 niveaux d'exigence, même notation de 0 à 20 mais barèmes adaptés\nRéférence : Différenciation pédagogique en EPS / Tomlinson 2001 — Enseignement différencié"]},
+{id:"g39",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Proposez 3 situations d'apprentissage pour développer l'explosivité et la détente verticale spécifique à la GAS chez des collégiens de 14 ans.",rep:["Situation 1 — Sauts à la corde : 3 × 30 sec saut continu bipodal → développe la réactivité du triceps sural et le rythme de saut", "Situation 2 — Sauts de haies basses (30 cm) en file : accent sur l'amortissement et la propulsion → 3 séries de 6 haies", "Situation 3 — Squat-jump avec réception contrôlée : 3 × 8 répétitions → explosivité concentrique + freinage excentrique", "Critères GAS spécifiques : la réception doit toujours être amortie (triple flexion) pour transférer à la réception des sauts gymniques", "Progression : commencer sans matériel → ajouter hauteur ou distance progressivement sur 4 semaines\nRéférence : Développement de la détente — Entraînement pliométrique adapté aux adolescents"]},
+{id:"g40",mod:"gas",disc:"Entraînement GAS",volet:"Entraînement",niv:"Appliquer",pts:2,q:"Comment organiser et gérer la sécurité lors d'une séance GAS avec 35 élèves et un seul enseignant ? Proposez un dispositif organisationnel précis.",rep:["Principe 1 — Zones délimitées : praticable divisé en 3-4 zones distinctes avec tapis, chaque zone = un niveau ou un élément", "Principe 2 — Parade par les pairs : former des binômes/trinômes entraînés à la parade (ex : tient les hanches pour ATR) → après démonstration et formation préalable", "Principe 3 — Fichier de travail : chaque élève a une fiche personnelle avec les éléments à travailler → travail en autonomie guidée", "Principe 4 — Zone d'intervention prioritaire : l'enseignant reste dans la zone des éléments les plus risqués (renversements, sauts) et surveille visuellement les autres zones", "Principe 5 — Règles de sécurité affichées : 5 règles simples rappelées en début de séance (jamais de course sur tapis, attendre son tour, signaler toute douleur)", "Organisation : 4 groupes de 8-9 élèves en rotation toutes les 8 minutes\nRéférence : Organisation et sécurité en EPS — GAS / Circulaire MEN sur la sécurité gymnique"]}
+];
+
+// ── STATE (accès direct, sans login ni validation formateur) ──
+const LOCAL_UID="guest-local"; // identifiant fixe utilisé pour sauvegarder/charger la progression
+let ST={uid:LOCAL_UID,name:"Étudiant",mod:"ath",volet:"Toutes",disc:"Toutes",answers:{},revealed:{},timers:{},evals:{}};
+
+// ── API ──
+async function apiGet(p){ const u=API+"?token="+encodeURIComponent(TOKEN)+"&"+new URLSearchParams(p); const r=await fetch(u); return r.json(); }
+async function apiPost(d){ const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...d,token:TOKEN})}); return r.json(); }
+
+// ── XSS SAFE ──
+function safe(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+function ini(n){const p=n.trim().split(/\s+/);return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.substring(0,2).toUpperCase();}
+
+// ── INIT — chargement direct de l'app, sans écran de connexion ──
+async function initApp(){
+  try{
+    const evRes=await apiGet({action:"getEvals",email:LOCAL_UID});
+    ST.evals=evRes||{};
+  }catch(e){ /* pas de réseau : on continue avec une progression vide */ }
+  renderAll();
+}
+
+// ── HELPERS ──
+function curMod(){return MODULES.find(m=>m.id===ST.mod)||MODULES[0];}
+function modQs(mid){return QUESTIONS.filter(q=>q.mod===mid);}
+function curQs(){
+  return QUESTIONS.filter(q=>{
+    if(q.mod!==ST.mod) return false;
+    if(ST.volet!=="Toutes" && q.volet!==ST.volet) return false;
+    if(ST.disc!=="Toutes" && q.disc!==ST.disc) return false;
+    return true;
+  });
+}
+function myEv(){return ST.evals[ST.mod]||{};}
+
+// ── RENDER ──
+function renderAll(){renderMods();renderConform();renderStats();renderVolets();renderDiscs();renderQs();}
+
+function renderMods(){
+  document.getElementById("mod-row").innerHTML=MODULES.map(m=>{
+    const qs=modQs(m.id), ev=ST.evals[m.id]||{};
+    const done=qs.filter(q=>ev[q.id]!==undefined).length;
+    return`<button class="mod-btn${m.id===ST.mod?" act":""}" onclick="switchMod('${m.id}')"
+      style="${m.id===ST.mod?"background:"+m.color+";border-color:"+m.color:""}">
+      <span class="mod-dot" style="background:${m.id===ST.mod?"rgba(255,255,255,.5)":m.color}"></span>
+      ${safe(m.label)} <span style="font-size:9px;opacity:.7">${done}/${qs.length}</span>
+    </button>`;
+  }).join("");
+}
+function switchMod(id){ST.mod=id;ST.volet="Toutes";ST.disc="Toutes";renderAll();}
+
+function renderConform(){
+  const mqs=modQs(ST.mod), ev=myEv();
+  document.getElementById("conform-box").innerHTML=`<div class="conform-title">Conformité par volet</div>
+  <div class="conform-grid">${VOLETS.slice(1).map(v=>{
+    const vqs=mqs.filter(q=>q.volet===v.id);
+    const done=vqs.filter(q=>ev[q.id]!==undefined).length;
+    const ok=vqs.filter(q=>ev[q.id]===2).length;
+    const pct=vqs.length?Math.round(done/vqs.length*100):0;
+    return`<div class="cv-item">
+      <div class="cv-label" style="color:${v.col}"><span>${v.id}</span><span>${done}/${vqs.length}</span></div>
+      <div class="cv-bar-wrap"><div class="cv-bar" style="width:${pct}%;background:${v.col}"></div></div>
+      <span class="cv-count" style="color:${v.col}">${ok} maîtrisées</span>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function renderStats(){
+  const qs=modQs(ST.mod), ev=myEv(), total=qs.length;
+  const done=qs.filter(q=>ev[q.id]!==undefined).length;
+  const ok=qs.filter(q=>ev[q.id]===2).length;
+  const part=qs.filter(q=>ev[q.id]===1).length;
+  document.getElementById("s-done").textContent=done;
+  document.getElementById("s-ok").textContent=ok;
+  document.getElementById("s-part").textContent=part;
+  document.getElementById("s-pct").textContent=total?Math.round(done/total*100)+"%":"0%";
+  const pb=document.getElementById("pb");
+  pb.style.width=(total?done/total*100:0)+"%";pb.style.background=curMod().color;
+}
+
+function renderLbSkel(){document.getElementById("lb-list").innerHTML='<div class="empty" style="padding:.3rem">Chargement…</div>';}
+async function refreshLb(){
+  try{
+    const [users,evals]=await Promise.all([apiGet({action:"getUsers"}),apiGet({action:"getAllEvals"})]);
+    const mid=ST.mod, mod=curMod();
+    const rows=(users||[]).filter(u=>u.status==="approved").map(u=>{
+      const ev=(evals&&evals[u.email]&&evals[u.email][mid])||{};
+      const qs=modQs(mid), total=qs.length;
+      const done=qs.filter(q=>ev[q.id]!==undefined).length;
+      const ok=qs.filter(q=>ev[q.id]===2).length;
+      return{name:u.name,group:u.group,done,ok,total,pct:total?Math.round(done/total*100):0};
+    }).sort((a,b)=>b.ok-a.ok||b.done-a.done);
+    const el=document.getElementById("lb-list");
+    if(!rows.length){el.innerHTML='<div class="empty" style="padding:.25rem">Aucun étudiant approuvé.</div>';return;}
+    el.innerHTML=rows.map((r,i)=>`<div class="lrow">
+      <div class="lrank">${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}</div>
+      <div class="avatar" style="width:20px;height:20px;font-size:8px;background:#1A5276;flex-shrink:0">${ini(r.name)}</div>
+      <div class="lname">${safe(r.name)} <span style="font-size:10px;color:#888">${safe(r.group)}</span></div>
+      <div class="lscore">${r.ok} ✓</div>
+      <div class="lpct">${r.pct}%</div>
+    </div>`).join("");
+  }catch(e){}
+}
+
+function renderVolets(){
+  const mqs=modQs(ST.mod), ev=myEv();
+  const all=mqs.length, allDone=mqs.filter(q=>ev[q.id]!==undefined).length;
+  document.getElementById("volet-row").innerHTML=VOLETS.map(v=>{
+    const isAll=v.id==="Toutes";
+    const vqs=isAll?mqs:mqs.filter(q=>q.volet===v.id);
+    const done=vqs.filter(q=>ev[q.id]!==undefined).length;
+    const act=ST.volet===v.id;
+    const col=isAll?"#1A1A1A":v.col;
+    return`<button class="volet-btn${act?" act":""}" onclick="switchVolet('${v.id}')"
+      style="${act?"background:"+col+";border-color:"+col:"border-left:3px solid "+col}">
+      ${v.icon} ${v.id}
+      <span class="volet-badge">${done}/${vqs.length}</span>
+    </button>`;
+  }).join("");
+}
+function switchVolet(v){ST.volet=v;ST.disc="Toutes";renderVolets();renderDiscs();renderQs();}
+
+function renderDiscs(){
+  const mqs=modQs(ST.mod);
+  const filtered=ST.volet==="Toutes"?mqs:mqs.filter(q=>q.volet===ST.volet);
+  const discs=["Toutes",...new Set(filtered.map(q=>q.disc))];
+  const col=ST.volet==="Toutes"?curMod().color:VCOL[ST.volet]||curMod().color;
+  document.getElementById("disc-label").textContent="Discipline"+(ST.volet!=="Toutes"?" · "+ST.volet:"");
+  document.getElementById("disc-row").innerHTML=discs.map(d=>`
+    <button class="disc-btn${d===ST.disc?" act":""}" onclick="switchDisc('${d}')"
+      style="${d===ST.disc?"background:"+col+";color:#fff;border-color:"+col:""}">
+      ${safe(d)}
+    </button>`).join("");
+}
+function switchDisc(d){ST.disc=d;renderDiscs();renderQs();}
+
+function renderQs(){
+  const qs=curQs(), ev=myEv();
+  const el=document.getElementById("q-list");
+  if(!qs.length){el.innerHTML='<div class="empty">Aucune question pour cette sélection.</div>';return;}
+  const vbg={"Réglementaire":"b-regl","Scientifique":"b-sci","Technique":"b-tech","Entraînement":"b-entr"};
+  const nbg={"Connaître / Comprendre":"b-conn","Appliquer":"b-appl","Analyser":"b-anal"};
+  let html="", lastV="";
+  qs.forEach(q=>{
+    if(q.volet!==lastV && ST.volet==="Toutes"){
+      html+=`<div class="sec-banner" style="background:${VBG[q.volet]||"#eee"};color:${VCOL[q.volet]||"#333"}">
+        ■ ${safe(q.volet)}
+      </div>`;
+      lastV=q.volet;
+    }
+    const evl=ev[q.id];
+    const evb=evl===2?'<span class="badge b-done">✓ Maîtrisée</span>':
+               evl===1?'<span class="badge b-part">~ En cours</span>':
+               evl===0?'<span class="badge" style="background:#FFEBEE;color:#C62828">✗ Retravailler</span>':"";
+    html+=`<div class="qcard">
+      <div class="qinner">
+        <div class="stripe" style="background:${VCOL[q.volet]||"#888"}"></div>
+        <div style="flex:1">
+          <div class="qhead">
+            <div class="qmeta">
+              <span style="font-size:9px;font-weight:700;color:#AAA">${safe(q.id.toUpperCase())}</span>
+              <span class="badge ${vbg[q.volet]||"b-conn"}">${safe(q.volet)}</span>
+              <span class="badge ${nbg[q.niv]||"b-conn"}">${safe(q.niv.replace("Connaître / Comprendre","Connaître"))}</span>
+              <span class="badge b-conn">${q.pts}pt${q.pts>1?"s":""}</span>${evb}
+            </div>
+            <div class="tmr" id="tmr-${q.id}">⏱ 0:00</div>
+          </div>
+          <div class="qtext">${safe(q.q)}</div>
+          <div class="qsub">Rédigez votre réponse (max 10 min) :</div>
+          <textarea id="ans-${q.id}" placeholder="Votre réponse…" onfocus="startTmr('${q.id}')">${ST.answers[q.id]||""}</textarea>
+          <div class="btn-row">
+            <button class="qbtn qbtn-pri" onclick="reveal('${q.id}')">👁 Voir la réponse</button>
+            <button class="qbtn" onclick="clearAns('${q.id}')">↺ Effacer</button>
+          </div>
+          ${ST.revealed[q.id]?renderCorr(q.id,q.rep,evl):""}
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function renderCorr(qid,rep,evl){
+  const sel=evl===undefined?`
+    <div class="self-ev">
+      <div class="sel-t">Auto-évaluation — comparez votre réponse :</div>
+      <div class="ev-row">
+        <button class="ev-btn ev0" onclick="setEv('${qid}',0)">✗ À retravailler</button>
+        <button class="ev-btn ev1" onclick="setEv('${qid}',1)">~ Partiellement</button>
+        <button class="ev-btn ev2" onclick="setEv('${qid}',2)">✓ Maîtrisée</button>
+      </div>
+    </div>`:"";
+  return`<div class="corr">
+    <div class="corr-t">✔ Éléments de réponse attendus</div>
+    ${rep.map(r=>`<div class="corr-item"><span class="cd">•</span><span>${safe(r)}</span></div>`).join("")}
+  </div>${sel}`;
+}
+
+function reveal(qid){stopTmr(qid);ST.revealed[qid]=true;renderQs();}
+function clearAns(qid){ST.answers[qid]="";const el=document.getElementById("ans-"+qid);if(el)el.value="";}
+
+async function setEv(qid,val){
+  if(!ST.evals[ST.mod])ST.evals[ST.mod]={};
+  ST.evals[ST.mod][qid]=val;
+  renderConform();renderStats();renderQs();
+  try{await apiPost({action:"saveEval",email:ST.uid,mod:ST.mod,qid,score:val});}catch(e){}
+}
+
+function startTmr(qid){
+  if(ST.timers[qid])return;
+  const el=document.getElementById("tmr-"+qid);let s=0;
+  ST.timers[qid]=setInterval(()=>{
+    s++;const m=Math.floor(s/60),sec=s%60;
+    if(el){el.textContent="⏱ "+m+":"+(sec<10?"0":"")+sec;
+      el.className="tmr"+(s>600?" red":s>480?" warn":"");}
+    if(s>=600)stopTmr(qid);
+  },1000);
+}
+function stopTmr(qid){if(ST.timers[qid]){clearInterval(ST.timers[qid]);delete ST.timers[qid];}}
+
+// ── DÉMARRAGE — accès direct à l'app ──
+initApp();
+</script>
+</body>
+</html>
